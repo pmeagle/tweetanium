@@ -1,0 +1,9 @@
+--- 
+:description: |
+  app:if is a non-visual control for conditionalexecution of content based on a Javascript expression
+
+:type: widget
+:licenses: 
+- 6
+:name: app:if
+:version: 3.0.0

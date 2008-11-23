@@ -1,0 +1,9 @@
+--- 
+:description: |
+  app:iterator is a UI control for iteratingover a set of array values from a message
+
+:type: widget
+:licenses: 
+- 6
+:name: app:iterator
+:version: 3.0.0

@@ -1,0 +1,9 @@
+--- 
+:description: |
+  app:statemachine is a non-visual widget forcontrolling states based on messages
+
+:type: widget
+:licenses: 
+- 6
+:name: app:statemachine
+:version: 3.0.0

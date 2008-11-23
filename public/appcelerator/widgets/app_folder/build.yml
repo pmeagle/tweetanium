@@ -1,0 +1,9 @@
+--- 
+:description: |
+  app:folder is a simple tree-like ui controlfor displaying items in a set of folders
+
+:type: widget
+:licenses: 
+- 6
+:name: app:folder
+:version: 3.0.0

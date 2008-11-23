@@ -1,0 +1,9 @@
+--- 
+:description: |
+  app:content allows you to load external HTML content.this content can be parameterized and can be loaded on-demand or when the page is first loaded
+
+:type: widget
+:licenses: 
+- 6
+:name: app:content
+:version: 3.0.0

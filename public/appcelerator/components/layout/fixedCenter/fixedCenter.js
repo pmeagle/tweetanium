@@ -1,0 +1,1 @@
+Appcelerator.UI.registerUIComponent("layout","fixedCenter",{getAttributes:function(){var A=Appcelerator.Types;return[{name:"width",optional:true,description:"width for fixed center portion",defaultValue:"1000px"}]},getVersion:function(){return"3.0.0"},getSpecVersion:function(){return 1},build:function(B,A){B.style.width=A.width;B.style.margin="auto"}});

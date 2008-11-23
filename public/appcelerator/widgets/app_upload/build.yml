@@ -1,0 +1,9 @@
+--- 
+:description: |
+  app:upload is a component which makes dynamicupload of multipart attachments simple.
+
+:type: widget
+:licenses: 
+- 6
+:name: app:upload
+:version: 3.0.0

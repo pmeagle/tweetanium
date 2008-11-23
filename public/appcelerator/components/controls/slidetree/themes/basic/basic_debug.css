@@ -1,0 +1,95 @@
+.slidetree_basic_container
+{
+	border:1px solid #e0e0e0;
+	border-top:none;
+
+}
+
+
+.slidetree_basic_header_container
+{
+	background:url(images/header.png) repeat-x;
+	height:43px;
+	
+}
+
+.slidetree_basic_page
+{
+	float:left;
+}
+
+.slidetree_basic_header
+{
+	position:relative;
+	
+}
+
+.slidetree_basic_back_button
+{
+	background:url(images/back.png) no-repeat;
+	width:47px;
+	height:30px;
+	position:absolute;
+	left:5px;
+	top:7px;
+	line-height:30px;
+	color:white;
+	font-size:12px;
+	text-align:center;
+	cursor:pointer;
+}
+.slidetree_basic_title
+{
+	color:white;
+	font-size:20px;
+	font-weight:bold;
+	text-align:center;
+	line-height:43px;
+	
+}
+
+
+.slidetree_basic_item
+{
+	background-color:white;
+	border-top:1px solid #E0E0E0;
+	cursor:pointer;
+	vertical-align:middle;
+	position:relative;
+}
+
+
+
+.slidetree_basic_item_icon
+{
+	position:absolute;
+	top:13px;
+	left:-20px;
+}
+.slidetree_basic_item_left
+{
+	position:absolute;
+	left:30px;
+	color:#111;
+	font-size:18px;
+	font-weight:bold;
+}
+
+.slidetree_basic_item_more
+{
+	position:absolute;
+	right:5px;
+	top:10px;
+	background:url(images/arrow.png);
+	height:25px;
+	width:20px;
+}
+.slidetree_basic_item_count
+{
+	color:black;
+	font-size:18px;
+	position:absolute;
+	right:10px;
+	top:0px;
+}
+

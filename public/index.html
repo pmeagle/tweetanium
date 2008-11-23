@@ -1,0 +1,39 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<link rel="stylesheet" href="stylesheets/site.css" type="text/css" charset="utf-8"/>
+	<link rel="stylesheet" href="stylesheets/login.css" type="text/css" charset="utf-8"/>
+	<script type="text/javascript" charset="utf-8" src="javascripts/appcelerator.js"></script>
+	<script type="text/javascript" charset="utf-8" src="javascripts/login.js"></script>
+</head>
+<body>
+	<div id="body">
+		<div id="header"><center><img src="images/login/header.png"/></center></div>
+		<div id="intro">
+			<span>Tweetanium</span> makes Twitter easy to use. Login with your
+			twitter credentials to get started. 
+		</div>
+		<div id="form">
+			<form>
+				<div class="input">
+					<div>Twitter Username:</div>
+					<input type="text" value="" id="username" validator="required"/>
+					<div class="shadow"></div>
+				</div>
+				<div class="input">
+					<div>Twitter Password:</div>
+					<input type="password" value="" id="password" validator="required" />
+					<div class="shadow"></div>
+				</div>
+				<div><center><button id="remember">Remember Me</button></center></div>
+				<div><center><button id="login" activators="username,password"><img src="images/login/button.png" /></button></center></div>
+			</form>
+		</div>
+		<div id="footer">
+			<a href="http://titaniumapp.com"><img src="images/poweredby.png"/></a>
+		</div>
+	</div>
+</body>
+</html>
+
+

@@ -1,0 +1,1 @@
+Appcelerator.Core.registerTheme("control","button","iphone_grey",{getAttributes:function(){var A=Appcelerator.Types;return[]},getVersion:function(){return"__VERSION__"},getSpecVersion:function(){return 1},build:function(B,A){}});

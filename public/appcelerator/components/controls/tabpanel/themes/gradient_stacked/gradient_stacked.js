@@ -1,0 +1,1 @@
+Appcelerator.Core.registerTheme("control","tabpanel","gradient_stacked",{getAttributes:function(){var A=Appcelerator.Types;return[]},getVersion:function(){return"__VERSION__"},getSpecVersion:function(){return 1},build:function(B,A){$(B.id+"_left").innerHTML=A.title||""}});

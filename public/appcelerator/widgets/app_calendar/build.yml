@@ -1,0 +1,9 @@
+--- 
+:description: |
+  app:calendar is a simple pop-up calendar controlthat uses the YUI calendar component from Yahoo!
+
+:type: widget
+:licenses: 
+- 6
+:name: app:calendar
+:version: 3.0.0

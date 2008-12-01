@@ -3,7 +3,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<link rel="stylesheet" href="stylesheets/site.css" type="text/css" charset="utf-8"/>
 	<link rel="stylesheet" href="stylesheets/login.css" type="text/css" charset="utf-8"/>
-	<script type="text/javascript" charset="utf-8" src="javascripts/appcelerator.js"></script>
+	<script type="text/javascript" charset="utf-8" src="javascripts/appcelerator-debug.js"></script>
 	<script type="text/javascript" charset="utf-8" src="javascripts/login.js"></script>
 </head>
 <body>
@@ -17,7 +17,7 @@
 			<form>
 				<div class="input">
 					<div>Twitter Username:</div>
-					<input type="text" value="" id="username" validator="required"/>
+					<input type="text" value="" id="username" validator="required" on="compiled then focus"/>
 					<div class="shadow"></div>
 				</div>
 				<div class="input">

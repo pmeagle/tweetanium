@@ -1,7 +1,5 @@
 (function($)
 {
-//	ti.App.setSize(350,730,false);
-	
 	$(function()
 	{
 		//TODO: since, paging
@@ -121,20 +119,18 @@
 
 	    var visible = true;
 
-/*
-	    var menu = ti.Menu.createSystemMenu("ti://public/images/tray_msg.png",function(sysmenu)
+	    var menu = ti.Menu.createSystemMenu("app://images/tray_msg.png",null,function(sysmenu)
 	    {
 	       if (visible)
 	       {
-	          ti.App.hide();
+	          ti.Window.currentWindow.hide();
 	       }
 	       else
 	       {
-	          ti.App.show();
+	          ti.Window.currentWindow.show();
 	       }
 	       visible = !visible;
 	    });
-*/
 		function calcLength()
 		{
 			var len = 140 - $('#tweettext').val().length;
@@ -162,16 +158,16 @@
 		$('#go').click(function()
 		{
 			var tweet = $.gsub($('#tweettext').val(),'\n','');
-			//TODO: source
 			$.ajax(
 			{
 				'username':username,
 				'password':password,
-				'type':'POST',
+				'type':'POST', 
 				'url':'http://twitter.com/statuses/update.json',
-				'data':{'status':tweet},
+				'data':{'status':tweet, 'source':'tweetanium'},
 				success:function(resp,textStatus)
 				{
+					$('#tweettext').val('');
 					loadTweets();
 				},
 				error:function(XMLHttpRequest, textStatus, errorThrown)

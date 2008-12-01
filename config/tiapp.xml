@@ -1,40 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ti:app xmlns:ti="http://ti.appcelerator.org" xmlns:appc="http://www.appcelerator.org">
-	<id>org.titaniumapp.tweetanium</id>
+    
+	<id>com.tweetanium</id>
 	<name>Tweetanium</name>
 	<description>Titanium-based twitter client application</description>
-	<copyright>Copyright (c) 2008 Appcelerator, Inc.</copyright>
-	<homepage>http://tweetanium.com</homepage>
+   <copyright>Copyright (c) 2008 Appcelerator, Inc.</copyright>
+   <homepage>http://tweetanium.com</homepage>
+	<updatesite>http://updatesite.titaniumapp.com</updatesite>
 	<version>0.1</version>
+
 	<window>
-		<id>login</id>
-		<title>Tweetanium</title>
-		<url>public/index.html</url>
+		<id>initial</id>
+		<title>Welcome to Tweetanium</title>
+		<url>app://index.html</url>
 		<width>700</width>
+		<min-width>0</min-width>
+		<max-width>9000</max-width>
 		<height>620</height>
-		<maximizable>false</maximizable>
-		<minimizable>false</minimizable>
-		<closeable>false</closeable>
-		<resizable>false</resizable>
-		<chrome scrollbars="false">true</chrome>
+		<min-height>0</min-height>
+		<max-height>9000</max-height>
+		<maximizable>true</maximizable>
+		<minimizable>true</minimizable>
+		<closeable>true</closeable>
+		<resizable>true</resizable>
+		<chrome scrollbars="true">true</chrome>
 		<transparency>1.0</transparency>
 	</window>
+
 	<window>
-		<id>main</id>
-		<title>Tweetanium</title>
-		<url>public/main.html</url>
-		<width>400</width>
-		<height>620</height>
-		<maximizable>false</maximizable>
-		<minimizable>false</minimizable>
-		<closeable>false</closeable>
-		<resizable>false</resizable>
-		<chrome scrollbars="false">true</chrome>
-		<transparency>0.9</transparency>
-	</window>
+      <id>main</id>
+      <title>Tweetanium</title>
+      <url>app://main.html</url>
+      <width>350</width>
+      <height>730</height>
+      <maximizable>false</maximizable>
+      <minimizable>false</minimizable>
+      <closeable>false</closeable>
+      <resizable>false</resizable>
+      <chrome scrollbars="false">true</chrome>
+      <transparency>1.0</transparency>
+   </window>
+
 	<icon>
-		<image16>tweetanium16.png</image16>
-		<image32>tweetanium32.png</image32>
-		<image48>tweetanium48.png</image48>
+		<image16>Tweetanium16.png</image16>
+		<image32>Tweetanium32.png</image32>
+		<image48>Tweetanium48.png</image48>
 	</icon>
+
 </ti:app>

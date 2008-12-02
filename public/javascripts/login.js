@@ -44,10 +44,11 @@ ti.ready(function($)
 		return false;
 	});
 	
+	// make the username become active
 	setTimeout(function()
 	{
 		$('#username').focus();
-		
 	},1000);
+	
 });
 

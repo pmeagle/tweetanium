@@ -50,7 +50,7 @@
 		{
 			return $.gsub(tweet,uriRE,function(m)
 			{
-				return '<a target="_new" href="' + m[0] + '">' + m[0] + '</a>';
+				return '<a target="ti:systembrowser" href="' + m[0] + '">' + m[0] + '</a>';
 			})
 		}
 		var unRE = /(@[\w]+)/;
@@ -331,6 +331,7 @@
 				success:function(resp,textStatus)
 				{
 					$('#tweettext').val('');
+					displayLength();
 					loadTweets();
 				},
 				error:function(XMLHttpRequest, textStatus, errorThrown)

@@ -27,17 +27,21 @@
 	<div id="stream">
 		<div id="tabs">
 			<ul>
-				<li class="active"><span>All</span><span class="count"></span></li>
-				<li><span>Replies</span><span class="count">(12)</span></li>
-				<li class="activex"><span>Direct Msg</span><span class="count">(6)</span></li>
+				<li class="tab tab_all active"><span>All</span><span class="count"></span></li>
+				<li class="tab tab_replies"><span>Replies</span><span class="count">(12)</span></li>
+				<li class="tab tab_dm"><span>Direct Msg</span><span class="count">(6)</span></li>
 			</ul>
 		</div>
 		<div id="content"></div>
+		<div id="replies_content" style="display:none"></div>
+		<div id="dm_content" style="display:none"></div>
+
 	</div>
 	<div id="status">
 		<img src="images/main/refresh.png" id="refresh"/>
 		<div id="status_msg">Loading...</div>
 	</div>
+	
 	<div id="footer">
 		<div>
 			<a target="ti:systembrowser" href="http://titaniumapp.com"><img src="images/poweredby.png" /></a>

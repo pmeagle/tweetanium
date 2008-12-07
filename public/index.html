@@ -6,8 +6,11 @@
 	<script type="text/javascript" charset="utf-8" src="javascripts/appcelerator-debug.js"></script>
 	<script type="text/javascript" charset="utf-8" src="javascripts/login.js"></script>
 	<script>
-		var db = new ti.Database;
-		alert(db);
+		ti.ready(function()
+		{
+			var db = new ti.Database;
+			alert(db);
+		})
 	</script>
 </head>
 <body>

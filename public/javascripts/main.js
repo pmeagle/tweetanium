@@ -346,7 +346,6 @@
 					{
 						try
 						{
-							alert($.toJSON(dms[c]))
 							var html = dmTemplate(formatTweet(dms[c],c));
 							$('#dm_content').append(html);
 						}

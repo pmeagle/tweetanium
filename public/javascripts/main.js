@@ -74,6 +74,7 @@
 			return obj;
 		}
 		
+		// NORMAL TEMPLATE
 		var rowTemplate = AppC.compileTemplate(''+
 		'<div class="entry">'+
 		'	<div class="top">'+
@@ -95,8 +96,62 @@
 		'		</div>' +
 		'	</div>' +
 		'</div>');
+
+		// DIRECT MESSAGE TEMPLATE
+		var dmTemplate = AppC.compileTemplate(''+
+		'<div class="entry">'+
+		'	<div class="top">'+
+		'		<a target="ti:systembrowser" href="http://twitter.com/#{sender.screen_name}" alt="Go to profile for #{sender.name}">#{sender.name}</a> <span>#{created_at} via #{sender.location}</span>'+
+		'	</div>'+
+		'	<div class="icon" id=#{id} style="height:48px;width:48px" >'+
+		'		<a target="ti:systembrowser" href="http://twitter.com/#{sender.screen_name}" alt="Go to profile for #{user.name}"><img src="#{sender.profile_image_url}"/></a>'+
+		'	</div>'+
+		'	<div class="message" id="message_#{id}">#{text}</div>'+
+		'   <div class="action_menu" id="action_menu_#{id}" style="display:none">' +
+		'		<div class="action_menu_container">' +
+		'			<div class="action reply active_action" name="#{user.screen_name}"><img src="images/main/reply_action.png"/><div>Reply</div></div>' +
+		'			<div class="action_divider"></div>' + 
+		'			<div class="action dm" name="#{user.screen_name}"><img src="images/main/dm_action.png"/><div>Direct Msg</div></div>' +
+		'			<div class="action_divider"></div>' + 
+		'			<div class="action retweet" name="#{user.screen_name}" row_id="#{id}"><img src="images/main/retweet_action.png"/><div>Re-tweet</div></div>'+
+		'			<div class="action_divider"></div>' + 
+		'			<div class="action favorite" tweet_id="#{id}"><img src="images/main/favorite_action.png"/><div>Favorite</div></div>'+
+		'		</div>' +
+		'	</div>' +
+		'</div>');
 		
 		var content = $('#content');
+
+		// HANDLE TAB CLICKS
+		$('.tab').click(function()
+		{
+			$('.tab').removeClass('active')
+			$(this).addClass('active')
+		});
+		// ALL TAB
+		$('.tab_all').click(function()
+		{
+			$('#content').show();
+			$('#replies_content').hide();
+			$('#dm_content').hide();		
+		});
+		
+		// DM TAB
+		$('.tab_dm').click(function()
+		{
+			$('#dm_content').show();		
+			$('#content').hide();
+			$('#replies_content').hide();
+		});
+		
+		// REPLIES TAB
+		$('.tab_replies').click(function()
+		{
+			$('#replies_content').show();
+			$('#content').hide();
+			$('#dm_content').hide();		
+		});
+		
 		
 		function loadTweets()
 		{
@@ -146,7 +201,8 @@
 					onNewTweets(tweets.length);
 					$('#refresh').attr('src','images/main/refresh.png');
 
-					// setup mousover/mouseout for action menu
+					
+					// HANDLE DISPLAY/HIDING OF ACTION MENU
 					$('.icon').mouseover(function()
 					{
 						var id = $(this).attr('id');
@@ -157,22 +213,30 @@
 					{
 						$('.action_menu').hide();
 					});
+					
+					// SHOW HOVER EFFECT OVER ACTION ITEM
 					$('.action').mouseover(function()
 					{
 						$('.action').removeClass('active_action');
 						$(this).addClass('active_action');
 					});
+					
+					// HANDLE ACTION CLICKS
 					$('.action').click(function()
 					{
 						var textbox = $('#tweettext');
 
+						// HANDLE REPLY
 						if ($(this).hasClass('reply'))
 						{
 							textbox.val('@' + $(this).attr('name') + ' ');
 							var val = textbox.val().length;
 							textbox[0].setSelectionRange(val,val)
 							displayLength();
+							return;
 						}
+						
+						// HANDLE DIRECT MESSAGE
 						if ($(this).hasClass('dm'))
 						{
 							textbox.val('D '+$(this).attr('name') + ' ');
@@ -180,9 +244,11 @@
 							textbox[0].setSelectionRange(val,val)
 							displayLength();
 							$('#mode').val('DM')								
-							$('#target_user').val($(this).attr('name'))								
-
+							$('#target_user').val($(this).attr('name'))	
+							return;							
 						}
+						
+						// HANDLE RETWEET
 						if ($(this).hasClass('retweet'))
 						{
 							var message = $('#message_' + $(this).attr('row_id')).html();
@@ -191,8 +257,10 @@
 							textbox[0].setSelectionRange(val,val)
 							displayLength();	
 							$('#mode').val('RT');							
-
+							return;
 						}
+						
+						// HANDLE FAVORITE
 						if ($(this).hasClass('favorite'))
 						{
 							var tweetId = $(this).attr('tweet_id');
@@ -223,7 +291,7 @@
 								}
 								
 							});
-							
+							return;
 						}
 					});
 					
@@ -234,6 +302,63 @@
 					//TODO
 				}
 			});
+			
+			$('#replies_content').empty();
+			// LOAD REPLIES
+			$.ajax(
+			{
+				'username':username,
+				'password':password,
+				'url':'http://twitter.com/statuses/replies.json',
+				'dataType':'json',
+				success:function(replies,textStatus)
+				{
+					var length = (replies.length > 4)?4:replies.length;
+					for (var c=0;c<length;c++)
+					{
+						try
+						{
+							var html = rowTemplate(formatTweet(replies[c],c));
+							$('#replies_content').append(html);
+						}
+						catch(E)
+						{
+							alert(E); //FIXME
+						}
+					}
+					
+				}
+			});
+			
+			$('#dm_content').empty();
+
+			// LOAD DM's
+			$.ajax(
+			{
+				'username':username,
+				'password':password,
+				'url':'http://twitter.com/direct_messages.json',
+				'dataType':'json',
+				success:function(dms,textStatus)
+				{
+					var length = (dms.length > 4)?4:dms.length;
+					for (var c=0;c<length;c++)
+					{
+						try
+						{
+							alert($.toJSON(dms[c]))
+							var html = dmTemplate(formatTweet(dms[c],c));
+							$('#dm_content').append(html);
+						}
+						catch(E)
+						{
+							alert(E); //FIXME
+						}
+					}
+					
+				}
+			});
+			
 		}
 		
 		// wire up refresh button

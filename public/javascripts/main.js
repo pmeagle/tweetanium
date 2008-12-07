@@ -257,7 +257,12 @@
 		checkRateLimit();
 
 		// create our tray area icon
-	    var menu = ti.Menu.createTrayMenu("app://images/tray_msg.png",null,function(sysmenu)
+		var trayIcon = "app://images/tray_msg.png";
+		if (ti.platform == "win32") {
+			trayIcon = "app://images/tray_msg.ico";
+		}
+
+	    var menu = ti.Menu.createTrayMenu(trayIcon,null,function(sysmenu)
 	    {
 	       if (ti.Window.currentWindow.isVisible())
 	       {
@@ -268,7 +273,7 @@
 	          ti.Window.currentWindow.show();
 	       }
 	    });
-	
+
 		function displayLength(e)
 		{
 			var count = $("#tweettext").val().length;

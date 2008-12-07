@@ -100,6 +100,7 @@ body
 	font-size:15px;
 	padding-right:10px;
 	margin-right:10px;
+	overflow:hidden;
 }
 
 #go
@@ -281,4 +282,85 @@ div.entry .message a
 {
 	xpacity:0.5;
 }
+
+.action_menu
+{
+	background:url(../images/main/action_bg.png) repeat-x;
+	height:67px;
+	position:absolute;
+	top:23px;
+	left:0px;
+	z-index:5;
+	width:330px;
+	font-size:11px;
+	font-family:"Lucida Sans";
+	color:#151c25;
+}
+.action_menu_container
+{
+	position:relative;
+}
+
+.action 
+{
+	float:left;
+	height:67px;
+	width:80px;
+	text-align:center;
+	position:relative;
+	cursor:pointer;
+}
+.action img
+{
+	position:relative;
+	top:17px;
+}
+.action.reply div
+{
+	position:relative;
+	top:19px;
+	left:3px;
+}
+.action.dm div
+{
+	position:relative;
+	top:20px;
+}
+.action.retweet div
+{
+	position:relative;
+	top:18px;
+}
+.action.favorite div
+{
+	position:relative;
+	top:20px;
+}
+.action_divider
+{
+	background:url(../images/main/action_divider.png) no-repeat;
+	width:1px;
+	height:47px;
+	float:left;
+	position:relative;
+	top:10px;
+}
+.active_action
+{
+	background:url(../images/main/active_action.png) no-repeat center center;
+	height:67px;
+	width:80px;
+	position:relative;
+	z-index:10;
+
+}
+
+
+'   <div class="action_menu" on="l:show.action[row='+row+'] then show else hide">' +
+'		<div class="reply_action active_action">Reply</div>' +
+'		<div class="dm_action">Direct Message</div>' +
+'		<div class="retweet_action">Re-tweet</div>'+
+'		<div class="favorite_action">Favorite</div>'+
+'	</div>'
+
 

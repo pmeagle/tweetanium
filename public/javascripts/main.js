@@ -62,7 +62,7 @@
 				return '<a target="ti:systembrowser" href="http://twitter.com/' + m[0].substring(1) + '">' + m[0] + '</a>';
 			})
 		}
-		function formatTweet(obj)
+		function formatTweet(obj,row)
 		{
 			var d = parseDate(obj.created_at);
 			obj.created_at = formatTime(d.getHours(),d.getMinutes());
@@ -79,10 +79,21 @@
 		'	<div class="top">'+
 		'		<a target="ti:systembrowser" href="http://twitter.com/#{user.screen_name}" alt="Go to profile for #{user.name}">#{user.name}</a> <span>#{created_at} via #{source}</span>'+
 		'	</div>'+
-		'	<div class="icon">'+
+		'	<div class="icon" id=#{id} style="height:48px;width:48px" >'+
 		'		<a target="ti:systembrowser" href="http://twitter.com/#{user.screen_name}" alt="Go to profile for #{user.name}"><img src="#{user.profile_image_url}"/></a>'+
 		'	</div>'+
-		'	<div class="message">#{text}</div>'+
+		'	<div class="message" id="message_#{id}">#{text}</div>'+
+		'   <div class="action_menu" id="action_menu_#{id}" style="display:none">' +
+		'		<div class="action_menu_container">' +
+		'			<div class="action reply active_action" name="#{user.screen_name}"><img src="images/main/reply_action.png"/><div>Reply</div></div>' +
+		'			<div class="action_divider"></div>' + 
+		'			<div class="action dm" name="#{user.screen_name}"><img src="images/main/dm_action.png"/><div>Direct Msg</div></div>' +
+		'			<div class="action_divider"></div>' + 
+		'			<div class="action retweet" name="#{user.screen_name}" row_id="#{id}"><img src="images/main/retweet_action.png"/><div>Re-tweet</div></div>'+
+		'			<div class="action_divider"></div>' + 
+		'			<div class="action favorite" tweet_id="#{id}"><img src="images/main/favorite_action.png"/><div>Favorite</div></div>'+
+		'		</div>' +
+		'	</div>' +
 		'</div>');
 		
 		var content = $('#content');
@@ -115,13 +126,14 @@
 					ti.App.debug('nextTime='+next+', interval='+interval+',next.getHours()='+next.getHours());
 					msg+='. Next: '+formatTime(next.getHours(),next.getMinutes());
 					$('#status_msg').html(msg);
-					
+				
 					for (var c=0;c<tweets.length;c++)
 					{
 						try
 						{
-							var html = rowTemplate(formatTweet(tweets[c]));
+							var html = rowTemplate(formatTweet(tweets[c],c));
 							content.append(html);
+							
 						}
 						catch(E)
 						{
@@ -133,6 +145,89 @@
 					resetInterval();
 					onNewTweets(tweets.length);
 					$('#refresh').attr('src','images/main/refresh.png');
+
+					// setup mousover/mouseout for action menu
+					$('.icon').mouseover(function()
+					{
+						var id = $(this).attr('id');
+						$('.action_menu').hide();
+						$('#action_menu_' + id).show();
+					});
+					$('.message').mouseover(function()
+					{
+						$('.action_menu').hide();
+					});
+					$('.action').mouseover(function()
+					{
+						$('.action').removeClass('active_action');
+						$(this).addClass('active_action');
+					});
+					$('.action').click(function()
+					{
+						var textbox = $('#tweettext');
+
+						if ($(this).hasClass('reply'))
+						{
+							textbox.val('@' + $(this).attr('name') + ' ');
+							var val = textbox.val().length;
+							textbox[0].setSelectionRange(val,val)
+							displayLength();
+						}
+						if ($(this).hasClass('dm'))
+						{
+							textbox.val('D '+$(this).attr('name') + ' ');
+							var val = textbox.val().length;
+							textbox[0].setSelectionRange(val,val)
+							displayLength();
+							$('#mode').val('DM')								
+							$('#target_user').val($(this).attr('name'))								
+
+						}
+						if ($(this).hasClass('retweet'))
+						{
+							var message = $('#message_' + $(this).attr('row_id')).html();
+							textbox.val('RT @'+$(this).attr('name')+': '+message+ ' ');
+							var val = textbox.val().length;
+							textbox[0].setSelectionRange(val,val)
+							displayLength();	
+							$('#mode').val('RT');							
+
+						}
+						if ($(this).hasClass('favorite'))
+						{
+							var tweetId = $(this).attr('tweet_id');
+							$.ajax(
+							{
+								'username':username,
+								'password':password,
+								'type':'POST', 
+								'url':'http://twitter.com/favorites/create/'+tweetId+'.json',
+								'data':{'id':tweetId},
+								success:function(resp,textStatus)
+								{
+									$('#tweettext').val('');
+									displayLength();
+									notification.setTitle('Favorite');
+									notification.setMessage('Your favorite request was successful');
+									notification.setIcon('app://images/notification.png');
+									notification.show();
+								},
+								error:function(XMLHttpRequest, textStatus, errorThrown)
+								{
+									$('#tweettext').val('');
+									displayLength();
+									notification.setTitle('Favorite');
+									notification.setMessage('Only one favorite per tweet!');
+									notification.setIcon('app://images/notification.png');
+									notification.show();
+								}
+								
+							});
+							
+						}
+					});
+					
+
 				},
 				error:function(XMLHttpRequest, textStatus, errorThrown)
 				{
@@ -321,25 +416,65 @@
 		$('#go').click(function()
 		{
 			var tweet = $.gsub($('#tweettext').val(),'\n','');
-			$.ajax(
+			var mode = $('#mode').val();
+			if (mode == 'NORMAL')
 			{
-				'username':username,
-				'password':password,
-				'type':'POST', 
-				'url':'http://twitter.com/statuses/update.json',
-				'data':{'status':tweet, 'source':'tweetanium'},
-				success:function(resp,textStatus)
+				$.ajax(
 				{
-					$('#tweettext').val('');
-					displayLength();
-					loadTweets();
-				},
-				error:function(XMLHttpRequest, textStatus, errorThrown)
+					'username':username,
+					'password':password,
+					'type':'POST', 
+					'url':'http://twitter.com/statuses/update.json',
+					'data':{'status':tweet, 'source':'tweetanium'},
+					success:function(resp,textStatus)
+					{
+						$('#tweettext').val('');
+						displayLength();
+						loadTweets();
+					},
+					error:function(XMLHttpRequest, textStatus, errorThrown)
+					{
+						notification.setTitle('Update');
+						notification.setMessage('Sorry there was an error from Twitter!');
+						notification.setIcon('app://images/notification.png');
+						notification.show();
+					}
+				});
+			}
+			// DIRECT MESSAGE
+			else if (mode == 'DM')
+			{
+				var user = $('#target_user').val();
+				$.ajax(
 				{
-					//FIXME
-					alert('error:'+textStatus+',error:'+errorThrown);
-				}
-			});
+					'username':username,
+					'password':password,
+					'type':'POST', 
+					'url':'http://twitter.com/direct_messages/new.json',
+					'data':{'text':tweet, 'user':user},
+					success:function(resp,textStatus)
+					{
+						$('#tweettext').val('');
+						displayLength();
+						notification.setTitle('Direct Message');
+						notification.setMessage('Your message has been sent');
+						notification.setIcon('app://images/notification.png');
+						notification.show();
+						
+					},
+					error:function(XMLHttpRequest, textStatus, errorThrown)
+					{
+						notification.setTitle('Direct Message');
+						notification.setMessage('Sorry there was an error from Twitter!');
+						notification.setIcon('app://images/notification.png');
+						notification.show();
+					}
+
+				});
+			}
+			
+			// RESET MODE
+			$('#mode').val('NORMAL');
 		});
 		
 		setTimeout(function(){

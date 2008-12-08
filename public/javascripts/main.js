@@ -1040,7 +1040,7 @@
 		// set our draggable region to the top 140px of our frame
 		ti.Extras.setDraggableRegionHandler(function(target,x,y)
 		{
-			return y < 140;
+			return y < 80;
 		});
 		
 		// just focus the initial textarea on load

@@ -91,9 +91,9 @@
 		var db = new ti.Database;
 		db.open ('tweetanium');
 		
-		//db.execute("drop table Tweets");
-		//db.execute("drop table Replies");
-		//db.execute("drop table DirectMessages");
+		// db.execute("drop table Tweets");
+		// db.execute("drop table Replies");
+		// db.execute("drop table DirectMessages");
 		
 		db.execute("create table if not exists Tweets (tweet text, id number, username text)");
 		db.execute("create table if not exists Replies (tweet text, id number, username text)");
@@ -279,6 +279,10 @@
 				{
 					$('.all_next_page').hide();							
 				}
+				else
+				{
+					$('.all_next_page').show();
+				}
 			}
 			
 			$('#refresh').attr('src','images/main/refresh.png');
@@ -336,6 +340,10 @@
 				{
 					$('.replies_next_page').hide();							
 				}
+				else
+				{
+					$('.replies_next_page').show();
+				}
 			}
 			
 			$('#refresh').attr('src','images/main/refresh.png');
@@ -392,6 +400,10 @@
 				if (tweetArray.length < 4)
 				{
 					$('.dm_next_page').hide();							
+				}
+				else
+				{
+					$('.dm_next_page').show();
 				}
 			}
 			
@@ -521,7 +533,7 @@
 						db.execute('insert into DirectMessages values(?,?,?)',[$.toJSON(dms[c]), dms[c].id,username])
 					}
 
-					if (dms.length > 0	)
+					if (dms.length > 0)
 					{
 						$('.dm_new_indicator').show();
 					}
@@ -770,6 +782,65 @@
 		}
 
 		//
+		// Home for "ALL" Tweets
+		//
+		$('.home_link').click(function()
+		{
+			switch(currentTab)
+			{
+				case 'ALL':
+				{
+					currentTweetPage = 1;		
+					currentTweetIndex = 0;				
+					$('#content').empty();
+					if (currentTweets.length > 4)
+					{
+						$('.all_next_page').show();						
+					}
+					else
+					{
+						$('.all_next_page').hide();					
+					}
+					$('.all_prev_page').hide()
+					break;
+				}
+				case 'REPLIES':
+				{
+					currentRepliesPage = 1;		
+					currentRepliesIndex = 0;				
+					$('#replies_content').empty();
+					if (currentReplies.length > 4)
+					{
+						$('.replies_next_page').show();						
+					}
+					else
+					{
+						$('.replies_next_page').hide();					
+					}
+					$('.replies_prev_page').hide()
+					break;
+				}
+				case 'DM':
+				{
+					currentDMPage = 1;		
+					currentDMIndex = 0;				
+					$('#dm_content').empty();
+					if (currentDMs.length > 4)
+					{
+						$('.dm_next_page').show();						
+					}
+					else
+					{
+						$('.dm_next_page').hide();					
+					}
+					$('.dm_prev_page').hide()
+					break;
+				}
+			}
+			setPageContent(0,4);
+		});
+		
+		//
 		// Paging for "ALL" Tweets
 		//
 		$('.next_page').click(function()
@@ -979,9 +1050,29 @@
 			}
 		}
 		
+		//
+		// sound for notificaiton updates
+		//
 		var soundPlaying = false;
-		var soundEnabled = true;
+		var soundEnabled = true;		
 		
+		// turn sound off
+		$('.sound_off').click(function()
+		{
+			$('.sound_off').hide();
+			$('.sound_on').show();
+			soundEnabled = false;
+		});
+		
+		// turn sound on
+		$('.sound_on').click(function()
+		{
+			$('.sound_on').hide();
+			$('.sound_off').show();
+			soundEnabled = true;
+		});
+
+		// play sound
 		function playSound(path)
 		{
 			if (!soundEnabled) return; // if turned off, don't use it!
@@ -1193,7 +1284,7 @@
 					'password':password,
 					'type':'POST', 
 					'url':'http://twitter.com/direct_messages/new.json',
-					'data':{'text':tweet, 'user':user},
+					'data':{'text':tweet, 'user':user, 'source': 'tweetanium'},
 					success:function(resp,textStatus)
 					{
 						$('#tweettext').val('');

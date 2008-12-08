@@ -210,10 +210,26 @@ body
 	bottom:10px;
 	width:330px;
 }
+.sound_off
+{
+	position:absolute;
+	left:1px;
+	top:0px;
+	cursor:pointer;
+}
+.sound_on
+{
+	position:absolute;
+	left:2px;
+	top:0px;
+	cursor:pointer;
+	
+}
 #footer
 {
 	margin-top:5px;
 	margin-bottom:30px;
+	position:relative;
 }
 
 #footer > div
@@ -386,6 +402,14 @@ div.entry .message a
 	left:120px;
 }
 
+.home_link
+{
+	position:absolute;
+	top:3px;
+	left:10px;
+	text-decoration:underline;
+	cursor:pointer;
+}
 .prev_page
 {
 	height:23px;

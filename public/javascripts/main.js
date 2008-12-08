@@ -4,7 +4,8 @@
 	{
 		var db = new ti.Database;
 		db.open ('tweetanium')
-		db.execute("create table if not exists Tweets (tweet blob, id number)");
+		db.execute('drop table Tweets');
+		db.execute("create table if not exists Tweets (tweet text, id number)");
 		
 		// vars for tweet data
 		var currentTweets = null;
@@ -227,22 +228,50 @@
 					msg+='. Next: '+formatTime(next.getHours(),next.getMinutes());
 					$('#status_msg').html(msg);
 					
-					var length = (tweets.length>4)?4:tweets.length;	
-					initTweetPaging(tweets);
-					for (var c=0;c<length;c++)
+					// var length = (tweets.length>4)?4:tweets.length;	
+					// initTweetPaging(tweets);
+					// for (var c=0;c<length;c++)
+					// {
+					// 	try
+					// 	{
+					// 		var html = rowTemplate(formatTweet(tweets[c]));
+					// 		content.append(html);
+					// 		db.execute('insert into Tweets values(?,?)',[$.toJSON(tweets[c]), tweets[c].id])
+					// 		
+					// 	}
+					// 	catch(E)
+					// 	{
+					// 		alert(E); //FIXME
+					// 	}
+					// }
+
+					for (var c=0;c<tweets.length;c++)
 					{
-						try
-						{
-							var html = rowTemplate(formatTweet(tweets[c]));
-							content.append(html);
-							
-						}
-						catch(E)
-						{
-							alert(E); //FIXME
-						}
+						if (c==0)sinceId = tweets[c].id;
+						db.execute('insert into Tweets values(?,?)',[$.toJSON(tweets[c]), tweets[c].id])
 					}
-					if (tweets.length == 0)
+					var rs = db.execute("select tweet from Tweets order by id DESC limit 200");
+					tweetArray = [];
+					var count = 0;
+					while (rs.isValidRow())
+					{
+						var value = rs.field(0);
+						var json = $.evalJSON(value);										
+						tweetArray[count] = json;
+
+						if (count < 4)
+						{
+							var html = rowTemplate(formatTweet(tweetArray[count]));
+							content.append(html);							
+						}
+
+						rs.next();
+						count++
+					}
+					initTweetPaging(tweetArray);
+					var length = (tweetArray.length>4)?4:tweetArray.length;	
+
+					if (tweetArray.length == 0)
 					{
 						$('.all_paging_text').html('No tweets found...');
 						$('.all_next_page').hide();

@@ -117,13 +117,13 @@ form button
 
 #login
 {
-	opacity:1.0;
+	xopacity:1.0;
 	cursor:pointer;
 }
 
 #login[disabled]
 {
-	opacity:0.5;
+	xopacity:0.5;
 	cursor:wait;
 }
 

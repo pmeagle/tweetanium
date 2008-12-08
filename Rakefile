@@ -15,9 +15,28 @@
 require 'fileutils'
 require 'yaml'
 
+# 
+# Build file for building the application and packaging it into a set of 
+# platform installers
+# 
+# You can just run 'rake' on each package and build the appropriate installer
+#
+# On OSX for example, you can cross-build for Win32 + OSX if you install the 
+# NSIS port
+#
+
 # read in the name of the app
 config = YAML::load_file(File.join('config','appcelerator.config'))
 APPNAME = config[:name]
+
+# read in the version for the app
+require "rexml/document"
+include REXML
+doc = Document.new(File.new(File.join('config','tiapp.xml')))
+APPVERSION = XPath.first(doc,'//version').text
+URL = XPath.first(doc,'//homepage').text
+NAME = XPath.first(doc,'//name').text
+
 
 task :setup do
 	FileUtils.mkdir_p 'stage'
@@ -41,6 +60,9 @@ def get_app_folder
 	raise "couldn't determine the folder name"
 end
 
+#
+# OSX build + installer maker dohicky
+#
 task :osx => [:setup] do
 	dir = File.expand_path(File.join('stage',APPNAME))
 	img = File.expand_path(File.join('stage',"#{APPNAME}.sparseimage"))
@@ -62,5 +84,31 @@ task :osx => [:setup] do
 	end
 end
 
+#
+# Bless Win32s heart - she's a little 'slow' these days
+# 
 task :win32 => [:setup] do
+	if not system "makensis -VERSION"
+		$stderr.puts "You cannot build the Win32 installer until you install NSIS and put it on your path"
+		$stderr.puts "Download from http://nsis.sourceforge.net or on OSX do a 'port install nsis'"
+		exit 1
+	end
+	FileUtils.mkdir_p File.join('stage','win32')
+	FileUtils.cp_r File.join('config/.'), File.join('stage','win32')
+#temp
+	system 'app package:project win32'
+	FileUtils.cp_r File.join('stage','tweetanium.win32'), File.join('stage','win32','app')
+	ver = APPVERSION.scan('\.').length
+	appversion = APPVERSION
+	# NSIS requires 0.0.0
+	while ver < 3 do
+		ver += 1
+		appversion = appversion + '.0'
+	end
+	FileUtils.cd('stage/win32') do
+		echo_system "makensis -DURL=\"#{URL}\" -DCOMPANY=\"#{NAME}\" -DAPPNAME=\"#{NAME.downcase}\" -DNAME=\"#{NAME}\" -DVERSION=\"#{appversion}\" installer.nsi"
+		FileUtils.cp 'installer.exe', File.expand_path(File.join('..',"#{APPNAME}.exe"))
+	end
 end
+
+

@@ -64,6 +64,11 @@
 		var currentReplies= null;
 		var currentDMs = null;
 
+		// current page
+		var currentTweetPage = 1;
+		var currentRepliesPage = 1;
+		var currentDMPage = 1;
+		
 		// number of pages
 		var tweetPages =0;
 		var repliesPages =0;
@@ -90,11 +95,6 @@
 		// initialize local DB
 		var db = new ti.Database;
 		db.open ('tweetanium');
-		
-		// db.execute("drop table Tweets");
-		// db.execute("drop table Replies");
-		// db.execute("drop table DirectMessages");
-		
 		db.execute("create table if not exists Tweets (tweet text, id number, username text)");
 		db.execute("create table if not exists Replies (tweet text, id number, username text)");
 		db.execute("create table if not exists DirectMessages (tweet text, id number, username text)");
@@ -437,6 +437,7 @@
 			}
 			$('#refresh').attr('src','images/main/refresh_bolt.png');
 			
+			// load All Tweets
 			var url = (sinceId == null)?'http://twitter.com/statuses/friends_timeline.json?count=200':
 					'http://twitter.com/statuses/friends_timeline.json?since_id='+sinceId;
 			$.ajax(
@@ -1070,7 +1071,7 @@
 		{
 			$('.sound_off').hide();
 			$('.sound_on').show();
-			soundEnabled = false;
+			soundEnabled = true;
 		});
 		
 		// turn sound on
@@ -1078,7 +1079,7 @@
 		{
 			$('.sound_on').hide();
 			$('.sound_off').show();
-			soundEnabled = true;
+			soundEnabled = false;
 		});
 
 		// play sound

@@ -354,13 +354,41 @@ div.entry .message a
 	z-index:10;
 
 }
+.paging
+{
+	height:20px;
+	background-color:#324450;
+	border-top:1px solid #5b7f92;
+	font-size:11px;
+	color:#96cce3;
+	position:relative;
+}
+.paging_text
+{
+	text-align:center;
+	line-height:20px;
+	position:absolute;
+	top:1px;
+	left:120px;
+}
 
-
-'   <div class="action_menu" on="l:show.action[row='+row+'] then show else hide">' +
-'		<div class="reply_action active_action">Reply</div>' +
-'		<div class="dm_action">Direct Message</div>' +
-'		<div class="retweet_action">Re-tweet</div>'+
-'		<div class="favorite_action">Favorite</div>'+
-'	</div>'
-
-
+.prev_page
+{
+	height:23px;
+	width:23px;
+	background:url(../images/main/prev.png) no-repeat;
+	position:absolute;
+	top:-1px;
+	right:26px;
+	cursor:pointer;
+}
+.next_page
+{
+	height:23px;
+	width:23px;
+	background:url(../images/main/next.png) no-repeat;
+	position:absolute;
+	top:-1px;
+	right:5px;
+	cursor:pointer;
+}

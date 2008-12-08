@@ -90,7 +90,11 @@ Section
   SectionIn RO
   SetOutPath "$INSTDIR"
   
-  File /r *.*
+  File app\*.exe
+	File app\icudt38.dll
+	File app\titanium.dll
+	File /r app\Resources
+	File /r app\plugins
 
   ; Add directory to the path
   Push $INSTDIR

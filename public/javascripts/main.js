@@ -8,102 +8,6 @@
 {
 	ti.ready(function()
 	{
-		var db = new ti.Database;
-		db.open ('tweetanium')
-		db.execute("create table if not exists Tweets (tweet text, id number)");
-		
-		// vars for tweet data
-		var currentTweets = null;
-		var currentReplies= null;
-		var currentDMs = null;
-
-		// number of pages
-		var tweetPages =0;
-		var repliesPages =0;
-		var dmPages =0;
-		
-		// current page
-		var currentTweetIndex =0;
-		var currentRepliesIndex =0;
-		var currentDMIndex = 0;
-		
-		// current tab
-		var currentTab = "ALL";
-		
-		// sinceId 
-		var sinceId = null;
-		
-		var username = AppC.params.u;
-		var password = AppC.params.p;
-		var remember = AppC.params.r;
-		
-		var months = {'Jan':0,'Feb':1,'Mar':2,'Apr':3,'May':4,'Jun':5,'Jul':6,'Aug':7,'Sep':8,'Oct':9,'Nov':10,'Dec':11};
-		var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-		
-		function today(d)
-		{
-			var now = new Date;
-			return d.getDay() == now.getDay() && 
-			       d.getDate() == now.getDate() &&
-				   d.getMonth() == now.getMonth();
-		}
-		function parseDate(d)
-		{
-			var parts = d.split(' ');
-			var date = new Date;
-			var time = parts[3].split(':');
-			date.setUTCMonth(months[parts[1]]);
-			date.setUTCDate(parts[2]);
-			date.setUTCFullYear(parts[5]);
-			date.setUTCHours(time[0]);
-			date.setUTCMinutes(time[1]);
-			date.setUTCSeconds(time[2]);
-			return date;
-		}
-		function formatTime(h,m)
-		{
-			m = m < 10 ? '0'+m : m;
-			var ampm = 'pm';
-			if (h < 12) 
-			{
-				h = h < 1 ? 12 : h;
-				ampm = 'am';
-			}
-			else
-			{
-				h = h - 12;
-			}
-			return h + ':' + m + ' ' + ampm;	
-		}
-		var uriRE = /((http[s]?):\/\/)([^:\/\s]+)((\/\w+)*\/)?([\w\-\.]+[^#?\s]+)?(.*)?(#[\w\-]+)?/;
-		function linkURIs(tweet)
-		{
-			return $.gsub(tweet,uriRE,function(m)
-			{
-				return '<a target="ti:systembrowser" href="' + m[0] + '">' + m[0] + '</a>';
-			})
-		}
-		var unRE = /(@[\w]+)/;
-		function linkReplies(tweet)
-		{
-			return $.gsub(tweet,unRE,function(m)
-			{
-				// target ti:systembrowser will cause titanium to open the link in the systembrowser (doh!)
-				return '<a target="ti:systembrowser" href="http://twitter.com/' + m[0].substring(1) + '">' + m[0] + '</a>';
-			})
-		}
-		function formatTweet(obj)
-		{
-			var d = parseDate(obj.created_at);
-			obj.display_date = formatTime(d.getHours(),d.getMinutes());
-			if (!today(d))
-			{
-				obj.created_at = days[d.getDay()] + obj.created_at;
-			}
-			obj.display_text = linkReplies(linkURIs(obj.text));
-			return obj;
-		}
-
 		var rowTemplate = AppC.compileTemplate(''+
 		'<div class="entry">'+
 		'	<div class="top">'+
@@ -149,8 +53,133 @@
 		'		</div>' +
 		'	</div>' +
 		'</div>');
+
+		// sinceIds
+		var sinceId = null;
+		var repliesSinceId = null;
+		var dmSinceId = null
 		
-		var content = $('#content');
+		// vars for tweet data
+		var currentTweets = null;
+		var currentReplies= null;
+		var currentDMs = null;
+
+		// number of pages
+		var tweetPages =0;
+		var repliesPages =0;
+		var dmPages =0;
+		
+		// current page
+		var currentTweetIndex =0;
+		var currentRepliesIndex =0;
+		var currentDMIndex = 0;
+
+		// current tab
+		var currentTab = "ALL";
+
+		// notification window
+		var notification = new ti.Notification;
+				
+		var username = AppC.params.u;
+		var password = AppC.params.p;
+		var remember = AppC.params.r;
+		
+		var months = {'Jan':0,'Feb':1,'Mar':2,'Apr':3,'May':4,'Jun':5,'Jul':6,'Aug':7,'Sep':8,'Oct':9,'Nov':10,'Dec':11};
+		var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+		
+		// initialize local DB
+		var db = new ti.Database;
+		db.open ('tweetanium');
+		
+		//db.execute("drop table Tweets");
+		//db.execute("drop table Replies");
+		//db.execute("drop table DirectMessages");
+		
+		db.execute("create table if not exists Tweets (tweet text, id number, username text)");
+		db.execute("create table if not exists Replies (tweet text, id number, username text)");
+		db.execute("create table if not exists DirectMessages (tweet text, id number, username text)");
+		
+		// see if we have data in db
+		loadDBTweets();
+		loadDBReplies();
+		loadDBDirectMessages();
+		
+		// initially check the rate and set it
+		checkRateLimit();
+		
+		//
+		//  Date Utility functions
+		//
+		function today(d)
+		{
+			var now = new Date;
+			return d.getDay() == now.getDay() && 
+			       d.getDate() == now.getDate() &&
+				   d.getMonth() == now.getMonth();
+		}
+		function parseDate(d)
+		{
+			var parts = d.split(' ');
+			var date = new Date();
+			var time = parts[3].split(':');
+			date.setUTCMonth(months[parts[1]]);
+			date.setUTCDate(parts[2]);
+			date.setUTCFullYear(parts[5]);
+			date.setUTCHours(time[0]);
+			date.setUTCMinutes(time[1]);
+			date.setUTCSeconds(time[2]);
+			return date;
+		}
+		function formatTime(h,m)
+		{
+			m = m < 10 ? '0'+m : m;
+			var ampm = 'pm';
+			if (h < 12) 
+			{
+				h = h < 1 ? 12 : h;
+				ampm = 'am';
+			}
+			else
+			{
+				h = h - 12;
+			}
+			return h + ':' + m + ' ' + ampm;	
+		}
+
+		//
+		// Formatting Utility functions
+		//
+		var uriRE = /((http[s]?):\/\/)([^:\/\s]+)((\/\w+)*\/)?([\w\-\.]+[^#?\s]+)?(.*)?(#[\w\-]+)?/;
+		function linkURIs(tweet)
+		{
+			return $.gsub(tweet,uriRE,function(m)
+			{
+				return '<a target="ti:systembrowser" href="' + m[0] + '">' + m[0] + '</a>';
+			})
+		}
+		var unRE = /(@[\w]+)/;
+
+		function linkReplies(tweet)
+		{
+			return $.gsub(tweet,unRE,function(m)
+			{
+				// target ti:systembrowser will cause titanium to open the link in the systembrowser (doh!)
+				return '<a target="ti:systembrowser" href="http://twitter.com/' + m[0].substring(1) + '">' + m[0] + '</a>';
+			})
+		}
+		function formatTweet(obj)
+		{
+			var d = parseDate(obj.created_at);
+			obj.display_date = formatTime(d.getHours(),d.getMinutes());
+			if (!today(d))
+			{
+				obj.created_at = days[d.getDay()] + obj.created_at;
+			}
+			obj.display_text = linkReplies(linkURIs(obj.text));
+			return obj;
+		}
+
+		
 
 		// HANDLE TAB CLICKS
 		$('.tab').click(function()
@@ -158,6 +187,7 @@
 			$('.tab').removeClass('active')
 			$(this).addClass('active')
 		});
+
 		// ALL TAB
 		$('.tab_all').click(function()
 		{
@@ -167,6 +197,7 @@
 			$('.dm_paging').hide();
 			$('.replies_paging').hide();
 			$('.all_paging').show();
+			$('.all_new_indicator').hide();
 			
 			currentTab = "ALL"		
 		});
@@ -180,6 +211,7 @@
 			$('.replies_paging').hide();
 			$('.all_paging').hide();
 			$('.dm_paging').show();
+			$('.dm_new_indicator').hide();
 
 			currentTab = "DM";
 		});
@@ -193,16 +225,189 @@
 			$('.all_paging').hide();
 			$('.dm_paging').hide();
 			$('.replies_paging').show();
+			$('.replies_new_indicator').hide();
 
 			currentTab = "REPLIES"
 		});
 		
+		//
+		// Load Tweets from DB
+		//
+		function loadDBTweets()
+		{
+			var rs = db.execute("select tweet,id from Tweets where username = ? order by id DESC", [username]);
+			tweetArray = [];
+			var count = 0;
+			var content = $('#content');
+			
+			// process rows
+			while (rs.isValidRow())
+			{
+				var value = rs.field(0);
+				var json = $.evalJSON(value);										
+				tweetArray[count] = json;
+				
+				// record since_id for new twitter updates
+				if (count == 0)sinceId = rs.field(1);
+				
+				// only show first 4
+				if (count < 4)
+				{
+					var html = rowTemplate(formatTweet(tweetArray[count]));
+					content.append(html);							
+				}
+
+				rs.next();
+				count++
+			}
+			
+			var length = (tweetArray.length>4)?4:tweetArray.length;	
+
+			// initialize paging
+			initTweetPaging(tweetArray);
+			if (tweetArray.length == 0)
+			{
+				$('.all_paging_text').html('No tweets found...');
+				$('.all_next_page').hide();
+				$('.all_prev_page').hide();
+			}
+			else
+			{
+				$('.all_paging_text').html('Showing  1 - ' + length + ' of  ' + currentTweets.length);						
+				$('.all_prev_page').hide();
+				if (tweetArray.length < 4)
+				{
+					$('.all_next_page').hide();							
+				}
+			}
+			
+			$('#refresh').attr('src','images/main/refresh.png');
+
+			// wire row entries for action overlay
+			wireEntries();
+		}
 
 		//
-		// MAIN LOADING FUNCTION - loads status updates, replies and DMs
+		// Load Replies from DB
+		//
+		function loadDBReplies()
+		{
+			var rs = db.execute("select tweet,id from Replies where username = ? order by id DESC", [username]);
+			tweetArray = [];
+			var count = 0;
+			var content = $('#replies_content');
+			
+			// process rows
+			while (rs.isValidRow())
+			{
+				var value = rs.field(0);
+				var json = $.evalJSON(value);										
+				tweetArray[count] = json;
+				
+				// record since_id for new twitter updates
+				if (count == 0)repliesSinceId = rs.field(1);
+
+				// only show first 4
+				if (count < 4)
+				{
+					var html = rowTemplate(formatTweet(tweetArray[count]));
+					content.append(html);							
+				}
+
+				rs.next();
+				count++
+			}
+			
+			var length = (tweetArray.length>4)?4:tweetArray.length;	
+
+			// initialize paging
+			initRepliesPaging(tweetArray);
+			if (tweetArray.length == 0)
+			{
+				$('.replies_paging_text').html('No replies found...');
+				$('.replies_next_page').hide();
+				$('.replies_prev_page').hide();
+			}
+			else
+			{
+				$('.replies_paging_text').html('Showing  1 - ' + length + ' of  ' + currentReplies.length);						
+				$('.replies_prev_page').hide();
+				if (tweetArray.length < 4)
+				{
+					$('.replies_next_page').hide();							
+				}
+			}
+			
+			$('#refresh').attr('src','images/main/refresh.png');
+
+			// wire row entries
+			wireEntries();
+		}
+
+
+		//
+		// Load DirectMessages from DB
+		//
+		function loadDBDirectMessages()
+		{
+			var rs = db.execute("select tweet,id from DirectMessages where username = ? order by id DESC", [username]);
+			tweetArray = [];
+			var count = 0;
+			var content = $('#dm_content');
+			
+			// process rows
+			while (rs.isValidRow())
+			{
+				var value = rs.field(0);
+				var json = $.evalJSON(value);										
+				tweetArray[count] = json;
+	
+				// record since_id for new twitter updates
+				if (count == 0)dmSinceId = rs.field(1);
+				
+				if (count < 4)
+				{
+					var html = dmTemplate(formatTweet(tweetArray[count]));
+					content.append(html);							
+				}
+
+				rs.next();
+				count++
+			}
+			
+			var length = (tweetArray.length>4)?4:tweetArray.length;	
+
+			// initialize paging
+			initDMPaging(tweetArray);
+			if (tweetArray.length == 0)
+			{
+				$('.dm_paging_text').html('No direct messages found...');
+				$('.dm_next_page').hide();
+				$('.dm_prev_page').hide();
+			}
+			else
+			{
+				$('.dm_paging_text').html('Showing  1 - ' + length + ' of  ' + currentDMs.length);						
+				$('.dm_prev_page').hide();
+				if (tweetArray.length < 4)
+				{
+					$('.dm_next_page').hide();							
+				}
+			}
+			
+			$('#refresh').attr('src','images/main/refresh.png');
+
+			// wire row entries
+			wireEntries();
+		}
+
+		//
+		// MAIN LOADING FUNCTION FROM TWITTER- loads status updates, replies and DMs
 		//
 		function loadTweets()
 		{
+			var content = $('#content');
+			
 			if (remaining_tweets < 0)
 			{
 				$('#status_msg').html('Rate limit exceeded');
@@ -231,61 +436,29 @@
 					ti.App.debug('nextTime='+next+', interval='+interval+',next.getHours()='+next.getHours());
 					msg+='. Next: '+formatTime(next.getHours(),next.getMinutes());
 					$('#status_msg').html(msg);
+
+					// store tweets in DB
 					for (var c=0;c<tweets.length;c++)
 					{
 						if (c==0)sinceId = tweets[c].id;
-						db.execute('insert into Tweets values(?,?)',[$.toJSON(tweets[c]), tweets[c].id])
+						db.execute('insert into Tweets values(?,?,?)',[$.toJSON(tweets[c]), tweets[c].id,username])
 					}
-					var rs = db.execute("select tweet from Tweets order by id DESC limit 200");
-					tweetArray = [];
-					var count = 0;
-					while (rs.isValidRow())
+					if (tweets.length > 0)
 					{
-						var value = rs.field(0);
-						var json = $.evalJSON(value);										
-						tweetArray[count] = json;
-
-						if (count < 4)
-						{
-							var html = rowTemplate(formatTweet(tweetArray[count]));
-							content.append(html);							
-						}
-
-						rs.next();
-						count++
-					}
-					initTweetPaging(tweetArray);
-					var length = (tweetArray.length>4)?4:tweetArray.length;	
-
-					if (tweetArray.length == 0)
-					{
-						$('.all_paging_text').html('No tweets found...');
-						$('.all_next_page').hide();
-						$('.all_prev_page').hide();
-					}
-					else
-					{
-						$('.all_paging_text').html('Showing  1 - ' + length + ' of  ' + currentTweets.length);						
-						$('.all_prev_page').hide();
-						if (currentTweets.length < 4)
-						{
-							$('.all_next_page').hide();							
-						}
-
+						$('.all_new_indicator').show();
 					}
 					
+					// load latest and show
+					loadDBTweets();
 					remaining_tweets--;
-					resetInterval();
 					onNewTweets(tweets.length);
-					$('#refresh').attr('src','images/main/refresh.png');
-
-					// wire row entries
-					wireEntries();
+					resetInterval();
 
 				},
 				error:function(XMLHttpRequest, textStatus, errorThrown)
 				{
-					//TODO
+					resetInterval();
+					startTimer();
 				}
 			});
 
@@ -293,101 +466,76 @@
 			// LOAD REPLIES
 			//
 			$('#replies_content').empty();
+			var repliesURL = (repliesSinceId == null)?'http://twitter.com/statuses/replies.json'
+						:'http://twitter.com/statuses/replies.json?since_id=' + repliesSinceId;
 			$.ajax(
 			{
 				'username':username,
 				'password':password,
-				'url':'http://twitter.com/statuses/replies.json',
+				'url':repliesURL,
 				'dataType':'json',
 				success:function(replies,textStatus)
 				{
-					var length = (replies.length > 4)?4:replies.length;
-					initRepliesPaging(replies);
-					for (var c=0;c<length;c++)
+					// store replies in DB
+					for (var c=0;c<replies.length;c++)
 					{
-						try
-						{
-							var html = rowTemplate(formatTweet(replies[c]));
-							$('#replies_content').append(html);
-						}
-						catch(E)
-						{
-							alert(E); //FIXME
-						}
+						if (c==0)repliesSinceId = replies[c].id;
+						db.execute('insert into Replies values(?,?,?)',[$.toJSON(replies[c]), replies[c].id,username])
 					}
-					if (replies.length == 0)
-					{
-						$('.replies_paging_text').html('No replies found...');
-						$('.replies_next_page').hide();
-						$('.replies_prev_page').hide();
-					}
-					else
-					{
-						$('.replies_paging_text').html('Showing  1 - ' + length + ' of  ' + replies.length);						
-						$('.replies_prev_page').hide();
-						if (currentReplies.length < 4)
-						{
-							$('.replies_next_page').hide();							
-						}
 
+					if (replies.length > 0)
+					{
+						$('.replies_new_indicator').show();
 					}
 					
-					// wire row entries
-					wireEntries();
-					
+					// load latest and show
+					loadDBReplies();			
+				},
+				error:function(XMLHttpRequest, textStatus, errorThrown)
+				{
+					resetInterval();
+					startTimer();
 				}
+				
 			});
 			
 			//
 			// LOAD DM's
 			//
 			$('#dm_content').empty();
+
+			var dmURL = (repliesSinceId == null)?'http://twitter.com/direct_messages.json'
+						:'http://twitter.com/direct_messages.json?since_id=' + dmSinceId;
 			$.ajax(
 			{
 				'username':username,
 				'password':password,
-				'url':'http://twitter.com/direct_messages.json',
+				'url':dmURL,
 				'dataType':'json',
 				success:function(dms,textStatus)
 				{
-					initDMPaging(dms);
-					var length = (dms.length > 4)?4:dms.length;
-					for (var c=0;c<length;c++)
+					// store dms in DB
+					for (var c=0;c<dms.length;c++)
 					{
-						try
-						{
-							var html = dmTemplate(formatTweet(dms[c]));
-							$('#dm_content').append(html);
-						}
-						catch(E)
-						{
-							alert(E); //FIXME
-						}
+						if (c==0)dmSinceId = dms[c].id;
+						db.execute('insert into DirectMessages values(?,?,?)',[$.toJSON(dms[c]), dms[c].id,username])
 					}
 
-					if (dms.length == 0)
+					if (dms.length > 0	)
 					{
-						$('.dm_paging_text').html('No DMs found...');
-						$('.dm_next_page').hide();
-						$('.dm_prev_page').hide();
+						$('.dm_new_indicator').show();
 					}
-					else
-					{
-						$('.dm_paging_text').html('Showing  1 - ' + length + ' of  ' + dms.length);						
-						$('.dm_prev_page').hide();
-						if (currentDMs.length < 4)
-						{
-							$('.dm_next_page').hide();							
-						}
-					}
+					
+					// load latest and show
+					loadDBDirectMessages();			
 
-					// wire row entries
-					wireEntries();
+				},
+				error:function(XMLHttpRequest, textStatus, errorThrown)
+				{
+					resetInterval();
+					startTimer();
 				}
 			});
-
-
-
 		}
 
 		//
@@ -724,7 +872,43 @@
 				// HANDLE RETWEET
 				if ($(this).hasClass('retweet'))
 				{
-					var message = $('.message_' + $(this).attr('row_id')).html();
+					var sql = null;
+					var tweetId = $(this).attr('row_id');
+					switch(currentTab)
+					{
+						case 'ALL':
+						{
+							sql = "select tweet from Tweets where username = ? and id = ? order by id DESC";
+							break;
+						}
+						case 'REPLIES':
+						{
+							sql = "select tweet from Replies where username = ? and id = ? order by id DESC";
+							break;
+						}
+						case 'DM':
+						{
+							sql = "select tweet from DirectMessages where username = ?  and id = ? order by id DESC";
+							break;
+						}
+					}
+					
+					// we want to get the unformatted message for re-tweet
+					var rs = db.execute(sql,[username,tweetId]);
+					var message = null
+					while (rs.isValidRow())
+					{
+						var tweet = rs.field(0);
+					 	tweet = $.evalJSON(tweet);
+						message = tweet.text;
+						break;
+					}
+					
+					// if null, pull from current tweet
+					if (message == null)
+					{
+						message = $('.message_' + tweetId).html();
+					}
 					textbox.val('RT @'+$(this).attr('name')+': '+message+ ' ');
 					var val = textbox.val().length;
 					textbox[0].setSelectionRange(val,val)
@@ -743,7 +927,7 @@
 						'password':password,
 						'type':'POST', 
 						'url':'http://twitter.com/favorites/create/'+tweetId+'.json',
-						'data':{'id':tweetId},
+						'data':{'id':tweetId,'source':'tweetanium'},
 						success:function(resp,textStatus)
 						{
 							$('#tweettext').val('');
@@ -818,7 +1002,6 @@
 			}
 		}
 		
-		var notification = new ti.Notification;
 		
 		function onNewTweets(count)
 		{
@@ -880,15 +1063,13 @@
 			});
 		}
 		
-		// initially check the rate and set it
-		checkRateLimit();
 
 		// create our tray area icon
-		var trayIcon = "app://images/tray_msg.png";
+		var trayIcon = "app://images/tray.png";
 		if (ti.platform == "win32") 
 		{
 			// in PR1, win32 doesn't support PNG directly
-			trayIcon = "app://images/tray_msg.ico";
+			trayIcon = "app://images/tray.ico";
 		}
 
 	    var menu = ti.Menu.createTrayMenu(trayIcon,null,function(sysmenu)
@@ -1012,7 +1193,7 @@
 					'password':password,
 					'type':'POST', 
 					'url':'http://twitter.com/direct_messages/new.json',
-					'data':{'text':tweet, 'user':user, 'source': 'tweetanium'},
+					'data':{'text':tweet, 'user':user},
 					success:function(resp,textStatus)
 					{
 						$('#tweettext').val('');

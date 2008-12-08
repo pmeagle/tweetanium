@@ -1,8 +1,25 @@
+var db = null;
+var notification = null;
+
 function login()
 {
 	var username = $('#username').val();
 	var password = $('#password').val();
-	var remember = $('#remember').val();
+	var remember = ($('#remember').hasClass('unchecked'))?false:true;
+	
+	// handle remember me feature
+	if ($('#remember').hasClass('unchecked'))
+	{
+		db.execute("update User set remember = 0");
+	}
+	else
+	{
+		// we only want to save one user at a time
+		db.execute('delete from User');
+		db.execute('insert into User values(?,?,?)', [$('#username').val(), $('#password').val(), 1]);
+	}
+	db.close();
+
 	$.ajax(
 	{
 		'username':username,
@@ -17,14 +34,19 @@ function login()
 			}
 			else
 			{
-				//FIXME
-				alert('login error = '+textStatus);
+				notification.setTitle('Login Failed');
+				notification.setMessage("Twitter don't know you. Try again");
+				notification.setIcon('app://images/notification.png');
+				notification.show();
+				
 			}
 		},
 		error:function(XMLHttpRequest, textStatus, errorThrown)
 		{
-			//FIXME
-			alert('error='+textStatus+',error='+errorThrown);
+			notification.setTitle('Login Failed');
+			notification.setMessage("Twitter don't know you. Try again");
+			notification.setIcon('app://images/notification.png');
+			notification.show();
 		}
 	});
 
@@ -32,6 +54,36 @@ function login()
 }
 ti.ready(function($)
 {
+	// initialize credentials
+	$('#username').val('');
+	$('#password').val('');
+	
+	// create user table if not exists
+ 	db =  new ti.Database;
+	db.open("tweetanium");	
+	db.execute("create table if not exists User (username text,password text, remember int)");
+
+	// get user credentials if remember me is set and user has logged in before	
+	var rs = db.execute("select username,password,remember from User");
+    while (rs.isValidRow())
+    {
+		// set credentials values if remember is set to true
+		if (rs.field(2) == 1)
+		{
+			$('#username').val(rs.field(0));
+			$('#password').val(rs.field(1));	
+			break;	
+		}
+		else
+		{
+			break;
+		}
+    }
+    rs.close();
+
+	// create global notificaiton object
+	notification = new ti.Notification;
+	
 	$('#remember').click(function()
 	{
 		if ($('#remember').hasClass('unchecked'))

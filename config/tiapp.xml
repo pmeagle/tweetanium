@@ -16,7 +16,7 @@
 		<width>700</width>
 		<min-width>0</min-width>
 		<max-width>9000</max-width>
-		<height>620</height>
+		<height>640</height>
 		<min-height>0</min-height>
 		<max-height>9000</max-height>
 		<maximizable>true</maximizable>
@@ -32,7 +32,7 @@
       <title>Tweetanium</title>
       <url>app://main.html</url>
       <width>350</width>
-      <height>730</height>
+      <height>750</height>
       <maximizable>false</maximizable>
       <minimizable>false</minimizable>
       <closeable>false</closeable>

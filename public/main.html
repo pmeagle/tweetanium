@@ -27,11 +27,33 @@
 	<div id="stream">
 		<div id="tabs">
 			<ul>
-				<li class="tab tab_all active"><span>All</span><span class="count"></span></li>
-				<li class="tab tab_replies"><span>Replies</span><span class="count">(12)</span></li>
-				<li class="tab tab_dm"><span>Direct Msg</span><span class="count">(6)</span></li>
+				<li class="tab tab_all active">
+					<span>All</span>
+				</li>
+				<li class="tab tab_replies">
+					<span>Replies</span>
+				</li>
+				<li class="tab tab_dm">
+					<span>Direct Msg</span>
+				</li>
 			</ul>
 		</div>
+		<div class="paging all_paging">
+			<div class="paging_text all_paging_text"></div>
+			<div class="next_page all_next_page"></div>
+			<div class="prev_page all_prev_page"></div>
+		</div>
+		<div class="paging replies_paging" style="display:none">
+			<div class="paging_text replies_paging_text"></div>
+			<div class="next_page replies_next_page"></div>
+			<div class="prev_page replies_prev_page"></div>
+		</div>
+		<div class="paging dm_paging" style="display:none">
+			<div class="paging_text dm_paging_text"></div>
+			<div class="next_page dm_next_page"></div>
+			<div class="prev_page dm_prev_page"></div>
+		</div>
+
 		<div id="content"></div>
 		<div id="replies_content" style="display:none"></div>
 		<div id="dm_content" style="display:none"></div>

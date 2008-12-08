@@ -105,9 +105,9 @@ Section
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${NAME}" "UninstallString" "$INSTDIR\Uninstall.exe"
 
   ;Create shortcuts
-  CreateShortCut "$SMPROGRAMS\${NAME}\${NAME}.lnk" "$INSTDIR\${APPNAME}.exe" "${NAME}"
+  CreateShortCut "$SMPROGRAMS\${NAME}\${NAME}.lnk" "$INSTDIR\${APPNAME}.exe"
   CreateShortCut "$SMPROGRAMS\${NAME}\Uninstall ${NAME}.lnk" "$INSTDIR\Uninstall.exe"
-  CreateShortcut "$DESKTOP\${NAME}.lnk" "$INSTDIR\${APPNAME}.exe" "${NAME}"
+  CreateShortcut "$DESKTOP\${NAME}.lnk" "$INSTDIR\${APPNAME}.exe"
   
   ;Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"

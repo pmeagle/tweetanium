@@ -197,6 +197,12 @@ body
 	font-size:11px;
 }
 
+#bottom
+{
+	position:fixed;
+	bottom:10px;
+	width:330px;
+}
 #footer
 {
 	margin-top:5px;
@@ -357,10 +363,10 @@ div.entry .message a
 .paging
 {
 	height:20px;
-	background-color:#324450;
+	background-color:#5d7280;
 	border-top:1px solid #5b7f92;
 	font-size:11px;
-	color:#96cce3;
+	color:#94bcbb;
 	position:relative;
 }
 .paging_text
@@ -378,7 +384,7 @@ div.entry .message a
 	width:23px;
 	background:url(../images/main/prev.png) no-repeat;
 	position:absolute;
-	top:-1px;
+	top:-2px;
 	right:26px;
 	cursor:pointer;
 }
@@ -388,7 +394,7 @@ div.entry .message a
 	width:23px;
 	background:url(../images/main/next.png) no-repeat;
 	position:absolute;
-	top:-1px;
+	top:-2px;
 	right:5px;
 	cursor:pointer;
 }

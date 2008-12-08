@@ -2,6 +2,10 @@
 {
 	ti.ready(function()
 	{
+		var db = new ti.Database;
+		db.open ('tweetanium')
+		db.execute("create table if not exists Tweets (tweet blob, id number)");
+		
 		// vars for tweet data
 		var currentTweets = null;
 		var currentReplies= null;
@@ -19,6 +23,9 @@
 		
 		// current tab
 		var currentTab = "ALL";
+		
+		// sinceId 
+		var sinceId = null;
 		
 		//TODO: since, paging
 		var username = AppC.params.u;
@@ -198,16 +205,18 @@
 				return;
 			}
 			$('#refresh').attr('src','images/main/refresh_bolt.png');
+			
+			var url = (sinceId == null)?'http://twitter.com/statuses/friends_timeline.json?count=200':
+					'http://twitter.com/statuses/friends_timeline.json?since_id='+sinceId;
 			$.ajax(
 			{
 				'username':username,
 				'password':password,
-				'url':'http://twitter.com/statuses/friends_timeline.json?count=200',
+				'url':url,
 				'dataType':'json',
 				success:function(tweets,textStatus)
 				{
 					content.empty();
-					
 					var now = new Date;
 					//Last Updated:13:57 with 6 tweets / next update 13:59
 					var nextTweet = now.getTime() + interval;
@@ -220,13 +229,13 @@
 					
 					var length = (tweets.length>4)?4:tweets.length;	
 					initTweetPaging(tweets);
-						
 					for (var c=0;c<length;c++)
 					{
 						try
 						{
 							var html = rowTemplate(formatTweet(tweets[c]));
 							content.append(html);
+							
 						}
 						catch(E)
 						{
@@ -414,8 +423,7 @@
 				end = (end > currentTweets.length)?currentTweets.length:end;
 				$('#content').empty();
 				currentTweetPage++;	
-				setPageContent(currentTweetIndex,end);
-				
+				setPageContent(currentTweetIndex,end);				
 				$('.all_prev_page').show();
 				if (currentTweetPage == tweetPages)
 				{
@@ -439,6 +447,7 @@
 				var end = currentTweetIndex + 4;
 				$('#content').empty();
 				currentTweetPage--;	
+				$('.all_next_page').show();
 				setPageContent(currentTweetIndex,end);	
 				if (currentTweetPage == 1)
 				{
@@ -453,7 +462,7 @@
 		}
 
 		//
-		// Next Page DMs
+		// Next Page Replies
 		//
 		function nextRepliesPage()
 		{
@@ -464,10 +473,9 @@
 				end = (end > currentReplies.length)?currentReplies.length:end;
 				$('#replies_content').empty();
 				currentRepliesPage++;	
-				setPageContent(currentRepliesIndex,end);
-				
+				setPageContent(currentRepliesIndex,end);			
 				$('.replies_prev_page').show();
-				if (currentRepliesPage == dmPages)
+				if (currentRepliesPage == repliesPages)
 				{
 					$('.replies_next_page').hide();
 				}
@@ -489,6 +497,7 @@
 				var end = currentRepliesIndex + 4;
 				$('#replies_content').empty();
 				currentRepliesPage--;	
+				$('.replies_next_page').show();
 				setPageContent(currentRepliesIndex,end);	
 				if (currentRepliesPage == 1)
 				{
@@ -514,8 +523,7 @@
 				end = (end > currentDMs.length)?currentDMs.length:end;
 				$('#dm_content').empty();
 				currentDMPage++;	
-				setPageContent(currentDMIndex,end);
-				
+				setPageContent(currentDMIndex,end);				
 				$('.dm_prev_page').show();
 				if (currentDMPage == dmPages)
 				{
@@ -539,6 +547,7 @@
 				var end = currentDMIndex + 4;
 				$('#dm_content').empty();
 				currentDMPage--;	
+				$('.dm_next_page').show();
 				setPageContent(currentDMIndex,end);	
 				if (currentDMPage == 1)
 				{

@@ -1,3 +1,10 @@
+/**
+ * Tweetanium is released under the terms of the 
+ * Apache Public License Version 2. 
+ * Copyright (c) 2008 by Appcelerator, Inc.
+ * http://tweetanium.com
+ */
+
 var db = null;
 var notification = null;
 
@@ -38,7 +45,6 @@ function login()
 				notification.setMessage("Twitter don't know you. Try again");
 				notification.setIcon('app://images/notification.png');
 				notification.show();
-				
 			}
 		},
 		error:function(XMLHttpRequest, textStatus, errorThrown)
@@ -104,6 +110,5 @@ ti.ready(function($)
 	{
 		$('#username').focus();
 	},1000);
-	
 });
 

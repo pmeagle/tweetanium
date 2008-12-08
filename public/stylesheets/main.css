@@ -286,7 +286,7 @@ div.entry .message a
 
 #go[disabled]
 {
-	xpacity:0.5;
+	background-image:url(../images/main/button_disabled.png);
 }
 
 .action_menu
@@ -299,7 +299,7 @@ div.entry .message a
 	z-index:5;
 	width:330px;
 	font-size:11px;
-	font-family:"Lucida Sans";
+	font-family:"Lucida Sans",sans-serif;
 	color:#151c25;
 }
 .action_menu_container

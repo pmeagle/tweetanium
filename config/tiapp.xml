@@ -4,8 +4,8 @@
 	<id>com.tweetanium</id>
 	<name>Tweetanium</name>
 	<description>Titanium-based twitter client application</description>
-   <copyright>Copyright (c) 2008 Appcelerator, Inc.</copyright>
-   <homepage>http://tweetanium.com</homepage>
+    <copyright>Copyright (c) 2008 Appcelerator, Inc.</copyright>
+    <homepage>http://tweetanium.com</homepage>
 	<updatesite>http://updatesite.titaniumapp.com</updatesite>
 	<version>0.1</version>
 
@@ -16,7 +16,7 @@
 		<width>700</width>
 		<min-width>0</min-width>
 		<max-width>9000</max-width>
-		<height>740</height>
+		<height>620</height>
 		<min-height>0</min-height>
 		<max-height>9000</max-height>
 		<maximizable>true</maximizable>

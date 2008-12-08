@@ -1,10 +1,15 @@
+/**
+ * Tweetanium is released under the terms of the 
+ * Apache Public License Version 2. 
+ * Copyright (c) 2008 by Appcelerator, Inc.
+ * http://tweetanium.com
+ */
 (function($)
 {
 	ti.ready(function()
 	{
 		var db = new ti.Database;
 		db.open ('tweetanium')
-		db.execute('drop table Tweets');
 		db.execute("create table if not exists Tweets (tweet text, id number)");
 		
 		// vars for tweet data
@@ -28,7 +33,6 @@
 		// sinceId 
 		var sinceId = null;
 		
-		//TODO: since, paging
 		var username = AppC.params.u;
 		var password = AppC.params.p;
 		var remember = AppC.params.r;
@@ -227,24 +231,6 @@
 					ti.App.debug('nextTime='+next+', interval='+interval+',next.getHours()='+next.getHours());
 					msg+='. Next: '+formatTime(next.getHours(),next.getMinutes());
 					$('#status_msg').html(msg);
-					
-					// var length = (tweets.length>4)?4:tweets.length;	
-					// initTweetPaging(tweets);
-					// for (var c=0;c<length;c++)
-					// {
-					// 	try
-					// 	{
-					// 		var html = rowTemplate(formatTweet(tweets[c]));
-					// 		content.append(html);
-					// 		db.execute('insert into Tweets values(?,?)',[$.toJSON(tweets[c]), tweets[c].id])
-					// 		
-					// 	}
-					// 	catch(E)
-					// 	{
-					// 		alert(E); //FIXME
-					// 	}
-					// }
-
 					for (var c=0;c<tweets.length;c++)
 					{
 						if (c==0)sinceId = tweets[c].id;
@@ -536,7 +522,6 @@
 				{
 					$('.replies_prev_page').show();
 				}
-
 			}
 		}
 
@@ -586,7 +571,6 @@
 				{
 					$('.dm_prev_page').show();
 				}
-
 			}
 		}
 
@@ -600,7 +584,6 @@
 			{
 				try
 				{
-					
 					switch (currentTab)
 					{
 						case "ALL":
@@ -619,7 +602,6 @@
 							$('.replies_paging_text').html('Showing ' + (start+1) + ' - ' + endNum + ' of  ' + currentReplies.length);
 							break;
 						}
-
 						case "DM":
 						{
 							var html = dmTemplate(formatTweet(currentDMs[i]));						
@@ -632,7 +614,7 @@
 				}
 				catch(E)
 				{
-					//
+					//FIXME
 				}
 			}
 			// wire row entries
@@ -699,6 +681,7 @@
 
 				$('.action_menu_' + id).show();
 			});
+			
 			$('.message').mouseover(function()
 			{
 				$('.action_menu').hide();
@@ -779,7 +762,6 @@
 							notification.setIcon('app://images/notification.png');
 							notification.show();
 						}
-
 					});
 					return;
 				}
@@ -903,12 +885,15 @@
 
 		// create our tray area icon
 		var trayIcon = "app://images/tray_msg.png";
-		if (ti.platform == "win32") {
+		if (ti.platform == "win32") 
+		{
+			// in PR1, win32 doesn't support PNG directly
 			trayIcon = "app://images/tray_msg.ico";
 		}
 
 	    var menu = ti.Menu.createTrayMenu(trayIcon,null,function(sysmenu)
 	    {
+		   // just toggle our visibility
 	       if (ti.Window.currentWindow.isVisible())
 	       {
 	          ti.Window.currentWindow.hide();
@@ -919,9 +904,14 @@
 	       }
 	    });
 	    
-	    menu.addItem("Exit", function() {
-	    	ti.Window.currentWindow.close();
-	    });
+		// in win32 we want to add an Exit menu to the tray
+		if (ti.platform == "win32")
+		{
+		    menu.addItem("Exit", function() 
+		    {
+		    	ti.Window.currentWindow.close();
+		    });
+		}
 
 		function displayLength(e)
 		{
@@ -939,12 +929,23 @@
 
 		function calcLength(e)
 		{
-			var count = $("#tweettext").val().length;
+			var tweet = $('#tweettext').val();
+			var count = tweet.length;
 			var len = 140 - (count + 1); // we add once since the new key isn't yet counted
 			if (len < 0 && e.keyCode!=8) // allow backspace!
 			{
 				e.preventDefault();
 				ti.Media.beep();
+				return false;
+			}
+			if (e.keyCode==13)
+			{
+				if (len > 1 && $.trim(tweet))
+				{
+					// this is for those power tweeters like scoble
+					$('#go').click();
+				}
+				e.preventDefault();
 				return false;
 			}
 		}
@@ -993,6 +994,7 @@
 					},
 					error:function(XMLHttpRequest, textStatus, errorThrown)
 					{
+						alert('textStatus='+textStatus+',error='+errorThrown);
 						notification.setTitle('Update');
 						notification.setMessage('Sorry there was an error from Twitter!');
 						notification.setIcon('app://images/notification.png');
@@ -1010,7 +1012,7 @@
 					'password':password,
 					'type':'POST', 
 					'url':'http://twitter.com/direct_messages/new.json',
-					'data':{'text':tweet, 'user':user},
+					'data':{'text':tweet, 'user':user, 'source': 'tweetanium'},
 					success:function(resp,textStatus)
 					{
 						$('#tweettext').val('');
@@ -1028,7 +1030,6 @@
 						notification.setIcon('app://images/notification.png');
 						notification.show();
 					}
-
 				});
 			}
 			
@@ -1036,6 +1037,13 @@
 			$('#mode').val('NORMAL');
 		});
 		
+		// set our draggable region to the top 140px of our frame
+		ti.Extras.setDraggableRegionHandler(function(target,x,y)
+		{
+			return y < 140;
+		});
+		
+		// just focus the initial textarea on load
 		setTimeout(function(){
 			$("#tweettext").focus();	
 		},1000);

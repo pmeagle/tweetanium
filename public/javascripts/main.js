@@ -880,6 +880,10 @@
 	          ti.Window.currentWindow.show();
 	       }
 	    });
+	    
+	    menu.addItem("Exit", function() {
+	    	ti.Window.currentWindow.close();
+	    });
 
 		function displayLength(e)
 		{

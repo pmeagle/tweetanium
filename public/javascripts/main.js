@@ -178,8 +178,14 @@
 			obj.display_text = linkReplies(linkURIs(obj.text));
 			return obj;
 		}
-
-		
+		function formatLinks(dom)
+		{
+			// ensure all embedding links open in the system browser instead of this window
+			$.each($(dom).find("a").not("[target]"),function()
+			{
+				$(this).attr('target','ti:systembrowser');
+			});
+		}
 
 		// HANDLE TAB CLICKS
 		$('.tab').click(function()
@@ -260,7 +266,8 @@
 				rs.next();
 				count++
 			}
-			
+			formatLinks(content);
+
 			var length = (tweetArray.length>4)?4:tweetArray.length;	
 
 			// initialize paging
@@ -317,6 +324,7 @@
 				rs.next();
 				count++
 			}
+			formatLinks(content);
 			
 			var length = (tweetArray.length>4)?4:tweetArray.length;	
 
@@ -374,6 +382,7 @@
 				rs.next();
 				count++
 			}
+			formatLinks(content);
 			
 			var length = (tweetArray.length>4)?4:tweetArray.length;	
 

@@ -760,7 +760,7 @@
 						{
 							var html = rowTemplate(formatTweet(currentTweets[i]));						
 							$('#content').append(html);
-							var endNum = ((end+1)> currentTweets.length)?currentTweets.length:(end+1);
+							var endNum = ((end)> currentTweets.length)?currentTweets.length:(end);
 							$('.all_paging_text').html('Showing ' + (start+1) + ' - ' + endNum + ' of  ' + currentTweets.length);
 							break;
 						}
@@ -768,7 +768,7 @@
 						{
 							var html = rowTemplate(formatTweet(currentReplies[i]));						
 							$('#replies_content').append(html);
-							var endNum = ((end+1)> currentReplies.length)?currentReplies.length:(end+1);
+							var endNum = ((end)> currentReplies.length)?currentReplies.length:(end);
 							$('.replies_paging_text').html('Showing ' + (start+1) + ' - ' + endNum + ' of  ' + currentReplies.length);
 							break;
 						}
@@ -776,7 +776,7 @@
 						{
 							var html = dmTemplate(formatTweet(currentDMs[i]));						
 							$('#dm_content').append(html);
-							var endNum = ((end+1)> currentDMs.length)?currentDMs.length:(end+1);
+							var endNum = ((end)> currentDMs.length)?currentDMs.length:(end);
 							$('.dm_paging_text').html('Showing ' + (start+1) + ' - ' + endNum + ' of  ' + currentDMs.length);
 							break;
 						}

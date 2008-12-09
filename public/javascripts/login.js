@@ -10,6 +10,9 @@ var notification = null;
 
 function login()
 {
+	$("#login").hide();
+	$("#indicator").show();
+	
 	var username = $('#username').val();
 	var password = $('#password').val();
 	var remember = ($('#remember').hasClass('unchecked'))?0:1;

@@ -1,9 +1,0 @@
---- 
-:description: |
-  app:http is a non-visual control for executingREST-style services
-
-:type: widget
-:licenses: 
-- 6
-:name: app:http
-:version: 3.0.0

@@ -1,9 +1,0 @@
---- 
-:description: |
-  app:script is a non-visual control for executingjavascript based on a message or when the page loads
-
-:type: widget
-:licenses: 
-- 6
-:name: app:script
-:version: 3.0.0

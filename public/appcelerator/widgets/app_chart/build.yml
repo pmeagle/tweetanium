@@ -1,9 +1,0 @@
---- 
-:description: |
-  app:chart is a flash-based charting component thatallows you do to either static or dynamic bar charts, line charts and pie charts
-
-:type: widget
-:licenses: 
-- 6
-:name: app:chart
-:version: 3.0.0

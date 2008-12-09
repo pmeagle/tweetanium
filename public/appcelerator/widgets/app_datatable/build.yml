@@ -1,9 +1,0 @@
---- 
-:description: |
-  app:datatable is a dynamic table UI control whichallows you to dynamically display table-oriented data in columns and rows and supports sorting either on the client or server-side
-
-:type: widget
-:licenses: 
-- 6
-:name: app:datatable
-:version: 3.0.0

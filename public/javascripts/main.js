@@ -178,18 +178,18 @@
 		//
 		// Formatting Utility functions
 		//
-		var uriRE = /((http[s]?):\/\/)([^:\/\s]+)((\/\w+)*\/)?([\w\-\.]+[^#?\s]+)?(.*)?(#[\w\-]+)?/;
 		function linkURIs(tweet)
 		{
+			var uriRE = /((http[s]?):\/\/)([^:\/\s]+)((\/\w+)*\/)?([\w\-\.]+[^#?\s]+)?(.*)?(#[\w\-]+)?/;
 			return $.gsub(tweet,uriRE,function(m)
 			{
 				return '<a target="ti:systembrowser" href="' + m[0] + '">' + m[0] + '</a>';
 			})
 		}
-		var unRE = /(@[\w]+)/;
 
 		function linkReplies(tweet)
 		{
+			var unRE = /(@[\w]+)/;
 			return $.gsub(tweet,unRE,function(m)
 			{
 				// target ti:systembrowser will cause titanium to open the link in the systembrowser (doh!)

@@ -12,18 +12,27 @@ function login()
 {
 	var username = $('#username').val();
 	var password = $('#password').val();
-	var remember = ($('#remember').hasClass('unchecked'))?false:true;
+	var remember = ($('#remember').hasClass('unchecked'))?0:1;
 	
-	// handle remember me feature
-	if ($('#remember').hasClass('unchecked'))
+	// get user if exsts
+	var rs = db.execute('select username from User where username = ?',[username]);
+	var userExists = false;
+  	while (rs.isValidRow())
+    {
+		userExists = true;
+		break;
+	}
+	rs.close();
+	
+	if (userExists == true)
 	{
-		db.execute("update User set remember = 0");
+		db.execute("update User set last_login = 0");
+		db.execute("update User set remember = ?, last_login = 1 where username = ?",[remember,username])
 	}
 	else
 	{
-		// we only want to save one user at a time
-		db.execute('delete from User');
-		db.execute('insert into User values(?,?,?)', [$('#username').val(), $('#password').val(), 1]);
+		db.execute("update User set last_login = 0");
+		db.execute('insert into User values(?,?,?,?,?)', [$('#username').val(), $('#password').val(), remember,1,1]);
 	}
 	db.close();
 
@@ -67,17 +76,17 @@ ti.ready(function($)
 	// create user table if not exists
  	db =  new ti.Database;
 	db.open("tweetanium");	
-	db.execute("create table if not exists User (username text,password text, remember int)");
+	db.execute("create table if not exists User (username text,password text, remember int, sound_on int, last_login int)");
 
 	// get user credentials if remember me is set and user has logged in before	
-	var rs = db.execute("select username,password,remember from User");
+	var rs = db.execute("select username,password,remember from User where last_login = 1");
     while (rs.isValidRow())
     {
 		// set credentials values if remember is set to true
 		if (rs.field(2) == 1)
 		{
 			$('#username').val(rs.field(0));
-			$('#password').val(rs.field(1));	
+			$('#password').val(rs.field(1));
 			break;	
 		}
 		else

@@ -405,7 +405,7 @@ div.entry .message a
 .home_link
 {
 	position:absolute;
-	top:3px;
+	top:2px;
 	left:10px;
 	text-decoration:underline;
 	cursor:pointer;

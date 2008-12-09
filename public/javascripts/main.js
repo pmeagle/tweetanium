@@ -54,6 +54,11 @@
 		'	</div>' +
 		'</div>');
 
+		// user info		
+		var username = AppC.params.u;
+		var password = AppC.params.p;
+		var remember = AppC.params.r;
+		
 		// sinceIds
 		var sinceId = null;
 		var repliesSinceId = null;
@@ -82,13 +87,14 @@
 		// current tab
 		var currentTab = "ALL";
 
+		// sound vars
+		var soundPlaying = false;
+		var soundEnabled = true;		
+
 		// notification window
-		var notification = new ti.Notification;
-				
-		var username = AppC.params.u;
-		var password = AppC.params.p;
-		var remember = AppC.params.r;
+		var notification = new ti.Notification;		
 		
+		// data for time/date formatting
 		var months = {'Jan':0,'Feb':1,'Mar':2,'Apr':3,'May':4,'Jun':5,'Jul':6,'Aug':7,'Sep':8,'Oct':9,'Nov':10,'Dec':11};
 		var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 		
@@ -98,6 +104,29 @@
 		db.execute("create table if not exists Tweets (tweet text, id number, username text)");
 		db.execute("create table if not exists Replies (tweet text, id number, username text)");
 		db.execute("create table if not exists DirectMessages (tweet text, id number, username text)");
+
+		// get sound preference for user from DB
+		var rs = db.execute('select sound_on from User where username = ?', [username]);
+		while (rs.isValidRow())
+		{
+			var soundOn = rs.field(0);
+			if (soundOn == 1)
+			{
+				soundEnabled=true;
+				$('.sound_off').hide();
+				$('.sound_on').show();
+				rs.close();
+				break;
+			}
+			else
+			{
+				soundEnabled=false;
+				$('.sound_on').hide();	
+				$('.sound_off').show();
+				rs.close();
+				break;			
+			}
+		}
 		
 		// see if we have data in db
 		loadDBTweets();
@@ -266,6 +295,8 @@
 				rs.next();
 				count++
 			}
+			rs.close();
+			
 			formatLinks(content);
 
 			var length = (tweetArray.length>4)?4:tweetArray.length;	
@@ -328,6 +359,8 @@
 				rs.next();
 				count++
 			}
+			rs.close();
+			
 			formatLinks(content);
 			
 			var length = (tweetArray.length>4)?4:tweetArray.length;	
@@ -390,6 +423,7 @@
 				rs.next();
 				count++
 			}
+			rs.close();
 			formatLinks(content);
 			
 			var length = (tweetArray.length>4)?4:tweetArray.length;	
@@ -984,6 +1018,7 @@
 						message = tweet.text;
 						break;
 					}
+					rs.close();
 					
 					// if null, pull from current tweet
 					if (message == null)
@@ -1060,28 +1095,29 @@
 			}
 		}
 		
-		//
-		// sound for notificaiton updates
-		//
-		var soundPlaying = false;
-		var soundEnabled = true;		
 		
-		// turn sound off
+		//
+		// setup sound handlers
+		//
+		
+		// sound on
 		$('.sound_off').click(function()
 		{
 			$('.sound_off').hide();
 			$('.sound_on').show();
 			soundEnabled = true;
+			db.execute('update User set sound_on = 1 where username = ?', [username]);
 		});
 		
-		// turn sound on
+		// turn sound off
 		$('.sound_on').click(function()
 		{
 			$('.sound_on').hide();
 			$('.sound_off').show();
 			soundEnabled = false;
+			db.execute('update User set sound_on = 0 where username = ?',[username]);	
 		});
-
+		
 		// play sound
 		function playSound(path)
 		{

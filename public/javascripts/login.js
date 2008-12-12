@@ -47,7 +47,7 @@ function login()
 		'dataType':'json',
 		success:function(data,textStatus)
 		{
-			if (textStatus == 'success' && data.authorized)
+			if (textStatus == 'success')
 			{
 				window.document.location.href = 'main.html?u='+encodeURIComponent(username)+'&p='+encodeURIComponent(password)+'&r='+remember;
 			}

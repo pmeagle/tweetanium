@@ -4,10 +4,10 @@
 	<id>com.tweetanium</id>
 	<name>Tweetanium</name>
 	<description>Titanium-based twitter client application</description>
-    <copyright>Copyright (c) 2008 Appcelerator, Inc.</copyright>
-    <homepage>http://tweetanium.com</homepage>
+   <copyright>Copyright (c) 2008 Appcelerator, Inc.</copyright>
+   <homepage>http://tweetanium.com</homepage>
 	<updatesite>http://updatesite.titaniumapp.com</updatesite>
-	<version>0.1</version>
+	<version>0.2</version>
 
 	<window>
 		<id>initial</id>

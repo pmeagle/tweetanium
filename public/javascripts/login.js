@@ -57,6 +57,8 @@ function login()
 				notification.setMessage("Twitter don't know you. Try again");
 				notification.setIcon('app://images/notification.png');
 				notification.show();
+				$("#login").show();
+				$("#indicator").hide();
 			}
 		},
 		error:function(XMLHttpRequest, textStatus, errorThrown)
@@ -65,6 +67,8 @@ function login()
 			notification.setMessage("Twitter don't know you. Try again");
 			notification.setIcon('app://images/notification.png');
 			notification.show();
+			$("#login").show();
+			$("#indicator").hide();
 		}
 	});
 

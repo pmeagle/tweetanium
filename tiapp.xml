@@ -13,10 +13,10 @@
 		<id>initial</id>
 		<title>Welcome to Tweetanium</title>
 		<url>app://index.html</url>
-		<width>700</width>
 		<min-width>0</min-width>
 		<max-width>9000</max-width>
 		<height>620</height>
+		<width>525</width>
 		<min-height>0</min-height>
 		<max-height>9000</max-height>
 		<maximizable>true</maximizable>
@@ -26,20 +26,6 @@
 		<chrome scrollbars="false">false</chrome>
 		<transparency>0.99</transparency>
 	</window>
-
-	<window>
-      <id>main</id>
-      <title>Tweetanium</title>
-      <url>app://main.html</url>
-      <width>350</width>
-      <height>750</height>
-      <maximizable>false</maximizable>
-      <minimizable>false</minimizable>
-      <closeable>false</closeable>
-      <resizable>false</resizable>
-      <chrome scrollbars="false">true</chrome>
-      <transparency>1.0</transparency>
-   </window>
 
 	<icon>
 		<image16>Tweetanium16.png</image16>

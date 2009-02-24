@@ -1,0 +1,47 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<link rel="stylesheet" href="stylesheets/site.css" type="text/css" charset="utf-8"/>
+	<link rel="stylesheet" href="stylesheets/login.css" type="text/css" charset="utf-8"/>
+    <script type="text/javascript" src="entourage/entourage-debug.js"></script>
+	<script type="text/javascript" charset="utf-8" src="javascripts/login.js"></script>
+	<script src="javascripts/tools.js" type="text/javascript" charset="utf-8"></script>
+	
+</head>
+<body>
+	<div id="body">
+		<div id="close" on="click then script[Titanium.window.close()]"><img src="images/login/close.png"/></div>
+		<div id="header"><center><img src="images/login/header.png"/></center></div>
+		<div id="intro">
+			<span>Tweetanium</span> makes Twitter easy to use. Login with your
+			twitter credentials to get started. 
+		</div>
+		<div id="form">
+			<div id="lform">
+				<div class="input">
+					<div>Twitter Username:</div>
+					<input type="text" value="" id="username" validator="required" />
+					<div class="shadow"></div>
+				</div>
+				<div class="input">
+					<div>Twitter Password:</div>
+					<input type="password" value="" id="password" validator="required" />
+					<div class="shadow"></div>
+				</div>
+				<div><center><button id="remember" class="unchecked">Remember Me</button></center></div>
+				<div>
+					<center>
+						<button id="login" activators="username,password" on="click then script[Tweetanium2.Login()]"><img src="images/login/button.png" /></button>
+						<img id="indicator" src="images/login/dots.gif" style="display:none;margin-top:10px"/>
+					</center>
+				</div>
+			</div>
+		</div>
+		<div id="footer">
+			<a target="ti:systembrowser" href="http://titaniumapp.com"><img src="images/poweredby.png"/></a>
+		</div>
+	</div>
+</body>
+</html>
+
+

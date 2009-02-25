@@ -66,6 +66,26 @@ Tweetanium2 = {
 			);
 		});
 	},
+	
+	RememberMe: function() 
+	{	
+	    Tweetanium2.db.transaction(function(tx) 
+		{				
+			tx.executeSql(
+				Tweetanium2.sql.login.setNewUser, 
+				[
+					jQuery('#username').val(), 
+					jQuery('#password').val(), 
+					1,
+					1,
+					1
+				], 
+				function(tx, result) 
+				{
+				}
+			);
+		});
+	},
 
 	GetCredentials: function()
 	{
@@ -102,32 +122,21 @@ Tweetanium2 = {
 		var password = jQuery('#password').val();
 		var remember = (jQuery('#remember').hasClass('unchecked')) ? 0 : 1;
 
-	    Tweetanium2.db.transaction(function(tx) 
+		if(remember == 1 && jQuery('#username').val() != "" && jQuery('#password').val() != "")
 		{
-			var userExists = false;
-			
-			tx.executeSql(
-				Tweetanium2.sql.login.getUser, 
-				[
-					Tweetanium2.user.username
-				],
-				function(tx, result) 
-				{
-				}
-			);			
-		});	
+			Tweetanium2.RememberMe();
+		}
 
 		jQuery.ajax(
 		{
-			url:'https://twitter.com/account/verify_credentials.json',
-			dataType:'json',
+			url: 'https://twitter.com/account/verify_credentials.json',
+			dataType: 'json',
 			
-			username:username,
-			password:password,
+			username: username,
+			password: password,
 			
 			success: function(data,textStatus)
 			{
-
 				if (textStatus == 'success')
 				{
 					window.document.location.href = 'main.html?u='+encodeURIComponent(username)+'&p='+encodeURIComponent(password)+'&r='+remember;
@@ -162,8 +171,6 @@ $MQL("l:app.compiled", function()
 	
 	jQuery('#remember').bind("click", function()
 	{
-		// Handle the "Remember Me" feature...
-		
 		if(jQuery('#username').val() != "" && jQuery('#password').val() != "")
 		{
 			var rememberMe = false;
@@ -171,24 +178,7 @@ $MQL("l:app.compiled", function()
 			if (jQuery(this).hasClass('unchecked'))
 			{
 				jQuery(this).attr('class','');
-				rememberMe = 1;
-				
-			    Tweetanium2.db.transaction(function(tx) 
-				{				
-					tx.executeSql(
-						Tweetanium2.sql.login.setNewUser, 
-						[
-							jQuery('#username').val(), 
-							jQuery('#password').val(), 
-							1,
-							1,
-							1
-						], 
-						function(tx, result) 
-						{
-						}
-					);
-				});				
+			    Tweetanium2.RememberMe();			
 			}
 			else
 			{
